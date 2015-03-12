@@ -1,0 +1,41 @@
+#pragma once
+
+#include "Application.h"
+#include "FlyCamera.h"
+#include <Gizmos.h>
+
+using glm::vec3;
+using glm::vec4;
+using glm::mat4;
+
+struct Vertex {
+	float x, y, z, w;
+	float nx, ny, nz, nw;
+	float tx, ty, tz, tw;
+	float s, t;
+};
+
+class Tutorial5 : public Application
+{
+public:
+	virtual void Startup();
+	virtual void Destroy();
+	virtual void Update();
+	virtual void Draw();
+
+private:
+	float previousTime;
+	float currentTime;
+	FlyCamera myCam;
+
+	unsigned int m_program;
+	unsigned int m_texture, m_normalmap;
+
+	unsigned int m_vao;
+	unsigned int m_vbo;
+	unsigned int m_ibo;
+
+	void setupShader();
+	void setupVerts();
+
+};
