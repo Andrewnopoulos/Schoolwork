@@ -81,6 +81,9 @@
     <ClCompile Include="..\src\Tutorial9.cpp">
       <Filter>Source Files\Tutorials</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Tutorial10.cpp">
+      <Filter>Source Files\Tutorials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gl_core_4_4.h">
@@ -138,6 +141,9 @@
       <Filter>Header Files\Tutorials</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Tutorial9.h">
+      <Filter>Header Files\Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Tutorial10.h">
       <Filter>Header Files\Tutorials</Filter>
     </ClInclude>
   </ItemGroup>
