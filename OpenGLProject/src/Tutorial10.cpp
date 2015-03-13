@@ -13,9 +13,13 @@ void Tutorial10::Startup()
 	myCam.setSpeed(20);
 	myCam.setRotationSpeed(0.1f);
 
-	setupMesh();
+	/*setupMesh();
 	setupFBO();
-	setupShader();
+	setupShader();*/
+
+	setupScreenQuad();
+	setupProcessing();
+	setupProcessingShader();
 
 }
 
@@ -50,6 +54,65 @@ void Tutorial10::setupMesh()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Tutorial10::setupProcessing()
+{
+	glGenFramebuffers(1, &m_fbo);	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);	
+	glGenTextures(1, &m_fboTexture);
+	glBindTexture(GL_TEXTURE_2D, m_fboTexture);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 1280, 720); // 1280 by 720 dimensions
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_NEAREST);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+		m_fboTexture, 0);
+
+	glGenRenderbuffers(1, &m_fboDepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, m_fboDepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24,
+		1280, 720);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+		GL_RENDERBUFFER, m_fboDepth);
+	GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, drawBuffers);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+}
+
+void Tutorial10::setupScreenQuad()
+{
+	glm::vec2 texelSize = 1.0f / glm::vec2(1280, 720);
+
+	glm::vec2 halfTexel = 1.0f / glm::vec2(1280, 720) * 0.5f;
+	float vertexData[] = {
+		-1, -1, 0, 1, halfTexel.x, halfTexel.y,
+		1, 1, 0, 1, 1 - halfTexel.x, 1 - halfTexel.y,
+		-1, 1, 0, 1, halfTexel.x, 1 - halfTexel.y,
+		-1, -1, 0, 1, halfTexel.x, halfTexel.y,
+		1, -1, 0, 1, 1 - halfTexel.x, halfTexel.y,
+		1, 1, 0, 1, 1 - halfTexel.x, 1 - halfTexel.y,
+	};
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)* 6 * 6,
+		vertexData, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+		sizeof(float)* 6, 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+		sizeof(float)* 6, ((char*)0) + 16);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Tutorial10::setupProcessingShader()
+{
+	m_programID = m_shaderManager->LoadShader("Processing", "../data/shaders/processing.vert", "../data/shaders/processing.frag");
 }
 
 void Tutorial10::setupFBO()
@@ -96,9 +159,25 @@ void Tutorial10::Update()
 	Gizmos::addTransform(glm::mat4(1));
 
 	Gizmos::addSphere(vec3(0, 5, 0), 0.5f, 8, 8, vec4(1, 1, 0, 1));
+
+	vec4 white(1);
+	vec4 black(0, 0, 0, 1);
+
+	for (int i = 0; i < 21; ++i)
+	{
+		Gizmos::addLine(
+			vec3(-10 + i, 0, 10),
+			vec3(-10 + i, 0, -10),
+			i == 10 ? white : black);
+
+		Gizmos::addLine(
+			vec3(10, 0, -10 + i),
+			vec3(-10, 0, -10 + i),
+			i == 10 ? white : black);
+	}
 }
 
-void Tutorial10::Draw()
+void Tutorial10::renderFBO()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glViewport(0, 0, 512, 512);
@@ -119,6 +198,38 @@ void Tutorial10::Draw()
 	glUniform1i(glGetUniformLocation(m_programID, "diffuse"), 0);
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+}
+
+void Tutorial10::renderProcessing()
+{
+	// bind our target
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glViewport(0, 0, 1280, 720);
+	// clear the target
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// draw our 3D scene
+	// gizmos for now
+	Gizmos::draw(myCam.getProjectionView());
+	// bind the back-buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, 1280, 720);
+	// just clear the back-buffer depth as
+	// each pixel will be filled
+	glClear(GL_DEPTH_BUFFER_BIT);
+	// draw out full-screen quad
+	glUseProgram(m_programID);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_fboTexture);
+	int loc = glGetUniformLocation(m_programID, "target");
+	glUniform1i(loc, 0);
+	glBindVertexArray(m_vao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Tutorial10::Draw()
+{
+	//renderFBO();
+	renderProcessing();
 
 }
 

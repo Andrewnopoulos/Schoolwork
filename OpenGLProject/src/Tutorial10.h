@@ -34,4 +34,14 @@ private:
 	void setupShader();
 	void setupFBO();
 	void setupMesh();
+
+	void renderFBO();
+
+	void setupProcessing();
+	void setupScreenQuad();
+	void setupProcessingShader();
+
+	void renderProcessing();
+
+
 };
