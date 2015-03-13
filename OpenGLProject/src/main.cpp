@@ -7,10 +7,11 @@
 #include "Tutorial7.h"
 #include "Tutorial8.h"
 #include "Tutorial9.h"
+#include "Tutorial10.h"
 
 int main() {
 
-	Tutorial9* tute = new Tutorial9();
+	Tutorial10* tute = new Tutorial10();
 
 	tute->Run();
 

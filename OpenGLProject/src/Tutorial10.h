@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "FlyCamera.h"
 #include <glm\glm.hpp>
+#include <Gizmos.h>
 
 using glm::vec3;
 using glm::vec4;
@@ -21,7 +22,16 @@ private:
 	float previousTime;
 	float currentTime;
 
+	unsigned int m_fbo;
+	unsigned int m_fboDepth;
+	unsigned int m_fboTexture;
+	unsigned int m_vao;
+	unsigned int m_vbo;
+	unsigned int m_ibo;
+
 	unsigned int m_programID;
 
 	void setupShader();
+	void setupFBO();
+	void setupMesh();
 };
