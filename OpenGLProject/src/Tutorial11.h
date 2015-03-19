@@ -37,6 +37,11 @@ private:
 	unsigned int m_vbo;
 	unsigned int m_ibo;
 
+	unsigned int m_fbo;
+	unsigned int m_fboDepth;
+
 	void setupShader();
 	void setupVerts();
+
+	void setupRenderTarget();
 };

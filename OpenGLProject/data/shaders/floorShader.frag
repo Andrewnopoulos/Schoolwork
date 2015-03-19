@@ -8,5 +8,5 @@ uniform vec3 lightDir;
 
 void main() { 
 	float d = max(0, dot(normalize(vNormal.xyz), lightDir));
-	FragColor = vec4(1, 0, 0, 1); //d, d, d, 1);
+	FragColor = vec4(d, d, d, 1);
 }

@@ -41,14 +41,13 @@ void Tutorial11::Update()
 	{
 		skeleton->m_nodes[bone_index]->updateGlobalTransform();
 	}
-
 }
 
 void Tutorial11::Draw()
 {
 	glUseProgram(m_floorShader);
 
-	vec3 light(sin(glfwGetTime()), 1, cos(glfwGetTime()));
+	vec3 light(1, sin(glfwGetTime()), cos(glfwGetTime()));
 	int loc = glGetUniformLocation(m_floorShader, "lightDir");
 	glUniform3f(loc, light.x, light.y, light.z);
 
@@ -258,4 +257,36 @@ void Tutorial11::setupVerts()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Tutorial11::setupRenderTarget()
+{
+	// setup shadow map buffer
+	glGenFramebuffers(1, &m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glGenTextures(1, &m_fboDepth);
+	glBindTexture(GL_TEXTURE_2D, m_fboDepth);
+
+	// texture uses a 16-bit depth component format
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024,
+		0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+		GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+		GL_CLAMP_TO_EDGE);
+
+	// attached as a depth attachment to capture depth not colour
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+		m_fboDepth, 0);
+
+	// no colour targets are used
+	glDrawBuffer(GL_NONE);
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+		printf("Framebuffer Error!\n");
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
