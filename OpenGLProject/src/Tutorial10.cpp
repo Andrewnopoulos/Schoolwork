@@ -58,7 +58,9 @@ void Tutorial10::setupMesh()
 
 void Tutorial10::setupProcessing()
 {
-	glGenFramebuffers(1, &m_fbo);	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);	
+	glGenFramebuffers(1, &m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	
 	glGenTextures(1, &m_fboTexture);
 	glBindTexture(GL_TEXTURE_2D, m_fboTexture);
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 1280, 720); // 1280 by 720 dimensions
@@ -74,7 +76,8 @@ void Tutorial10::setupProcessing()
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24,
 		1280, 720);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-		GL_RENDERBUFFER, m_fboDepth);
+		GL_RENDERBUFFER, m_fboDepth);
+
 	GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, drawBuffers);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -184,7 +187,8 @@ void Tutorial10::renderFBO()
 	glClearColor(0.75f, 0.75f, 0.75f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// draw our meshes, or gizmos, to the render target
-	Gizmos::draw(myCam.getProjectionView());
+	Gizmos::draw(myCam.getProjectionView());
+
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, 1280, 720);

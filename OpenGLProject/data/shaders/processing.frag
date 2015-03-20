@@ -81,6 +81,6 @@ vec4 Simple()
 
 void main() 
 {
-	FragColour = Edgy() ;
+	FragColour = Distort() ;
 }
 

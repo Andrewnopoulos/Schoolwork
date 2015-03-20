@@ -11,10 +11,13 @@ out vec3 vPosition;
 out vec3 vBiTangent;
 out vec3 vTangent;
 out vec2 vTexCoord;
+out vec4 vShadowCoord;
 
 uniform mat4 ProjectionView;
 const int MAX_BONES = 128;
 uniform mat4 bones[MAX_BONES];
+
+uniform mat4 LightMatrix;
 
 void main() 
 { 
@@ -29,4 +32,6 @@ void main()
 	P += bones[index.z] * Position * weights.z;
 	P += bones[index.w] * Position * weights.w;
 	gl_Position = ProjectionView * P; 
+	
+	vShadowCoord = LightMatrix * P;
 }

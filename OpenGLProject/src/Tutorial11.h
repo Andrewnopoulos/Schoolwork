@@ -44,4 +44,11 @@ private:
 	void setupVerts();
 
 	void setupRenderTarget();
+
+	vec3 m_lightDirection;
+	mat4 m_lightMatrix;
+
+	mat4 textureSpaceOffset;
+
+	void setupShadowMap();
 };

@@ -22,6 +22,8 @@ void Tutorial11::Startup()
 
 	setupVerts();
 
+	setupShadowMap();
+
 	loadTextures();
 }
 
@@ -45,28 +47,44 @@ void Tutorial11::Update()
 
 void Tutorial11::Draw()
 {
+	m_lightDirection = glm::normalize(vec3(1, sin(glfwGetTime()), cos(glfwGetTime())));
+
+	mat4 lightMatrix = textureSpaceOffset * m_lightMatrix;
+
 	glUseProgram(m_floorShader);
 
-	vec3 light(1, sin(glfwGetTime()), cos(glfwGetTime()));
 	int loc = glGetUniformLocation(m_floorShader, "lightDir");
-	glUniform3f(loc, light.x, light.y, light.z);
+	glUniform3f(loc, m_lightDirection.x, m_lightDirection.y, m_lightDirection.z);
 
 	loc = glGetUniformLocation(m_floorShader, "ProjectionView");
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(myCam.getProjectionView()));
+
+	loc = glGetUniformLocation(m_floorShader, "LightMatrix");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, &lightMatrix[0][0]);
+
+	loc = glGetUniformLocation(m_floorShader, "shadowMap");
+	glUniform1i(loc, 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, m_fboDepth);
 
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 	glUseProgram(m_programID);
 
+	loc = glGetUniformLocation(m_programID, "shadowMap");
+	glUniform1i(loc, 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, m_fboDepth);
+
+	loc = glGetUniformLocation(m_programID, "LightMatrix");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, &lightMatrix[0][0]);
+
 	loc = glGetUniformLocation(m_programID, "ProjectionView");
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(myCam.getProjectionView()));
 
-	/*int light_dir_uniform = glGetUniformLocation(m_programID, "LightDir");
-	glUniform3f(light_dir_uniform, 0, 1, 0);*/
-
 	loc = glGetUniformLocation(m_programID, "LightDir");
-	glUniform3f(loc, light.x, light.y, light.z);
+	glUniform3f(loc, m_lightDirection.x, m_lightDirection.y, m_lightDirection.z);
 
 	int light_colour_uniform = glGetUniformLocation(m_programID, "LightColour");
 	glUniform3f(light_colour_uniform, 1, 1, 1);
@@ -224,10 +242,10 @@ void Tutorial11::loadTextures()
 void Tutorial11::setupVerts()
 {
 	float vertexData[] = {
-		-1000, -100, 1000, 1, 0, 1, 0, 0,
-		1000, -100, 1000, 1, 0, 1, 0, 0,
-		1000, -100, -1000, 1, 0, 1, 0, 0,
-		-1000, -100, -1000, 1, 0, 1, 0, 0,
+		-5000, -100, 5000, 1, 0, 1, 0, 0,
+		5000, -100, 5000, 1, 0, 1, 0, 0,
+		5000, -100, -5000, 1, 0, 1, 0, 0,
+		-5000, -100, -5000, 1, 0, 1, 0, 0,
 	};
 	unsigned int indexData[] = {
 		0, 1, 2,
@@ -290,3 +308,53 @@ void Tutorial11::setupRenderTarget()
 		printf("Framebuffer Error!\n");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+void Tutorial11::setupShadowMap()
+{
+	// setup shadow map buffer
+	glGenFramebuffers(1, &m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glGenTextures(1, &m_fboDepth);
+	glBindTexture(GL_TEXTURE_2D, m_fboDepth);
+
+	// texture uses a 16-bit depth component format
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024,
+		0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+		GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+		GL_CLAMP_TO_EDGE);
+
+	// attached as a depth attachment to capture depth not colour
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+		m_fboDepth, 0);
+
+	// no colour targets are used
+	glDrawBuffer(GL_NONE);
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+		printf("Framebuffer Error!\n");
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	m_lightDirection = glm::normalize(glm::vec3(1, 2.5f, 1));
+
+	glm::mat4 lightProjection = glm::ortho<float>(-10, 10,
+		-10, 10, -10, 10);
+
+	glm::mat4 lightView = glm::lookAt(m_lightDirection,
+		glm::vec3(0), glm::vec3(0, 1, 0));
+
+	m_lightMatrix = lightProjection * lightView;
+
+	textureSpaceOffset = mat4(
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f
+		);
+}
+
