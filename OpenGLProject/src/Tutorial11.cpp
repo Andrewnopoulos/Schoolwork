@@ -34,6 +34,14 @@ void Tutorial11::Update()
 	previousTime = currentTime;
 	myCam.update(deltaTime);
 
+	glm::mat4 lightProjection = glm::ortho<float>(-20000, 20000,
+		-20000, 20000, -20000, 20000);
+
+	glm::mat4 lightView = glm::lookAt(m_lightDirection,
+		glm::vec3(0), glm::vec3(0, 1, 0));
+
+	m_lightMatrix = lightProjection * lightView;
+
 	FBXSkeleton* skeleton = m_fbx->getSkeletonByIndex(0);
 	FBXAnimation* animation = m_fbx->getAnimationByIndex(0);
 
@@ -47,13 +55,43 @@ void Tutorial11::Update()
 
 void Tutorial11::Draw()
 {
-	m_lightDirection = glm::normalize(vec3(1, sin(glfwGetTime()), cos(glfwGetTime())));
+	m_lightDirection = glm::normalize(vec3(sin(glfwGetTime()), 3, cos(glfwGetTime())));
 
 	mat4 lightMatrix = textureSpaceOffset * m_lightMatrix;
 
+	FBXSkeleton* skeleton = m_fbx->getSkeletonByIndex(0);
+	skeleton->updateBones();
+
+	// shadow pass: bind our shadow map target and clear the depth
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glViewport(0, 0, 1024, 1024);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(m_shadowDepth);
+	// bind the light matrix
+	int loc = glGetUniformLocation(m_shadowDepth, "LightMatrix");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, &(m_lightMatrix[0][0]));
+
+	int bones_location = glGetUniformLocation(m_shadowDepth, "bones");
+	glUniformMatrix4fv(bones_location, skeleton->m_boneCount, GL_FALSE, (float*)skeleton->m_bones);
+
+	// draw all shadow-casting geometry
+	for (unsigned int i = 0; i < m_fbx->getMeshCount(); ++i) {
+		FBXMeshNode* mesh = m_fbx->getMeshByIndex(i);
+		unsigned int* glData = (unsigned int*)mesh->m_userData;
+		glBindVertexArray(glData[0]);
+		glDrawElements(GL_TRIANGLES,
+			(unsigned int)mesh->m_indices.size(),
+			GL_UNSIGNED_INT, 0);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, 1280, 720);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 	glUseProgram(m_floorShader);
 
-	int loc = glGetUniformLocation(m_floorShader, "lightDir");
+	loc = glGetUniformLocation(m_floorShader, "lightDir");
 	glUniform3f(loc, m_lightDirection.x, m_lightDirection.y, m_lightDirection.z);
 
 	loc = glGetUniformLocation(m_floorShader, "ProjectionView");
@@ -73,9 +111,7 @@ void Tutorial11::Draw()
 	glUseProgram(m_programID);
 
 	loc = glGetUniformLocation(m_programID, "shadowMap");
-	glUniform1i(loc, 3);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, m_fboDepth);
+	glUniform1i(loc, 2);
 
 	loc = glGetUniformLocation(m_programID, "LightMatrix");
 	glUniformMatrix4fv(loc, 1, GL_FALSE, &lightMatrix[0][0]);
@@ -108,10 +144,7 @@ void Tutorial11::Draw()
 	loc = glGetUniformLocation(m_programID, "normal");
 	glUniform1i(loc, 1);
 
-	FBXSkeleton* skeleton = m_fbx->getSkeletonByIndex(0);
-	skeleton->updateBones();
-
-	int bones_location = glGetUniformLocation(m_programID, "bones");
+	bones_location = glGetUniformLocation(m_programID, "bones");
 	glUniformMatrix4fv(bones_location, skeleton->m_boneCount, GL_FALSE, (float*)skeleton->m_bones);
 
 	// bind our vertex array object and draw the mesh
@@ -203,8 +236,9 @@ void Tutorial11::cleanupOpenGLBuffers(FBXFile* fbx)
 
 void Tutorial11::setupShader()
 {
-	m_programID = m_shaderManager->LoadShader("Shadows", "../data/shaders/tut11.vert", "../data/shaders/tut11.frag");
+	m_programID = m_shaderManager->LoadShader("Object", "../data/shaders/tut11.vert", "../data/shaders/tut11.frag");
 	m_floorShader = m_shaderManager->LoadShader("Floor", "../data/shaders/floorShader.vert", "../data/shaders/floorShader.frag");
+	m_shadowDepth = m_shaderManager->LoadShader("Shadows", "../data/shaders/shadow.vert", "../data/shaders/shadow.frag");
 }
 
 void Tutorial11::loadTextures()

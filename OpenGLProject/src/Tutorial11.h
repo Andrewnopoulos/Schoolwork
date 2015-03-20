@@ -30,6 +30,7 @@ private:
 	FBXFile* m_fbx;
 	unsigned int m_programID;
 	unsigned int m_floorShader;
+	unsigned int m_shadowDepth;
 
 	unsigned int m_texture, m_normal;
 
