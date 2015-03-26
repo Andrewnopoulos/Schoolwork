@@ -3,6 +3,8 @@
 #include "tiny_obj_loader.h"
 #include "ShaderManager.h"
 
+#include <stack>
+
 void Tutorial12::generatePerlin(unsigned int dimension)
 {
 	float* perlin_data = new float[dimension * dimension];
@@ -19,7 +21,7 @@ void Tutorial12::generatePerlin(unsigned int dimension)
 
 			for (int o = 0; o < octaves; ++o)
 			{
-				float freq = powf(1, (float)o);
+				float freq = powf(2, (float)o);
 				float perlin_sample =
 					glm::perlin(vec2((float)x, (float)y) * scale * freq) * 0.5f + 0.5f;
 				perlin_data[y * dimension + x] += perlin_sample * amplitude;
@@ -35,6 +37,133 @@ void Tutorial12::generatePerlin(unsigned int dimension)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+float Tutorial12::randomNumber()
+{
+	return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+}
+
+void Tutorial12::generateDiamondSquare(unsigned int dimension)
+{
+	float* diamond_square_data = new float[dimension * dimension];
+
+	float randomRange = 1;
+
+	srand(100);
+
+	struct DiamondSquareData
+	{
+		unsigned int uiTopLeftIndex;
+		unsigned int uiTopRightIndex;
+		unsigned int uiBottomLeftIndex;
+		unsigned int uiBottomRightIndex;
+
+	};
+
+	std::stack<DiamondSquareData> diamondStack;
+
+	DiamondSquareData d;
+	d.uiTopLeftIndex = 0;
+	d.uiTopRightIndex = dimension - 1;
+	d.uiBottomLeftIndex = (dimension * (dimension - 1));
+	d.uiBottomRightIndex = (dimension * dimension) - 1;
+
+	diamondStack.push(d);
+
+	DiamondSquareData init = diamondStack.top();
+
+	diamond_square_data[init.uiTopLeftIndex] = randomNumber() * randomRange;
+	diamond_square_data[init.uiTopRightIndex] = randomNumber() * randomRange;
+	diamond_square_data[init.uiBottomLeftIndex] = randomNumber() * randomRange;
+	diamond_square_data[init.uiBottomRightIndex] = randomNumber() * randomRange;
+
+	while (!diamondStack.empty())
+	{
+		DiamondSquareData dtop = diamondStack.top();
+		diamondStack.pop();
+
+		int sideLength = dtop.uiTopRightIndex - dtop.uiTopLeftIndex;
+
+		unsigned int middleIndex = (dtop.uiTopLeftIndex + dtop.uiBottomRightIndex) / 2;
+		
+		diamond_square_data[middleIndex] =
+			(diamond_square_data[dtop.uiTopLeftIndex] +
+			diamond_square_data[dtop.uiTopRightIndex] +
+			diamond_square_data[dtop.uiBottomLeftIndex] +
+			diamond_square_data[dtop.uiBottomRightIndex]) / 4 + randomNumber() * randomRange;
+
+		unsigned int topIndex = dtop.uiTopLeftIndex + sideLength / 2;
+		unsigned int leftIndex = middleIndex - sideLength / 2;
+		unsigned int rightIndex = middleIndex + sideLength / 2;
+		unsigned int bottomIndex = dtop.uiBottomLeftIndex + sideLength / 2;
+
+		diamond_square_data[topIndex] =
+			(diamond_square_data[middleIndex] +
+			diamond_square_data[dtop.uiTopLeftIndex] +
+			diamond_square_data[dtop.uiTopRightIndex]) / 3 + randomNumber() * randomRange;
+
+		diamond_square_data[leftIndex] =
+			(diamond_square_data[middleIndex] +
+			diamond_square_data[dtop.uiTopLeftIndex] +
+			diamond_square_data[dtop.uiBottomLeftIndex]) / 3 + randomNumber() * randomRange;
+
+		diamond_square_data[rightIndex] =
+			(diamond_square_data[middleIndex] +
+			diamond_square_data[dtop.uiBottomRightIndex] +
+			diamond_square_data[dtop.uiTopRightIndex]) / 3 + randomNumber() * randomRange;
+
+		diamond_square_data[bottomIndex] =
+			(diamond_square_data[middleIndex] +
+			diamond_square_data[dtop.uiBottomLeftIndex] +
+			diamond_square_data[dtop.uiBottomRightIndex]) / 3 + randomNumber() * randomRange;
+
+		if (sideLength >= 2)
+		{
+			DiamondSquareData topLeft;
+			DiamondSquareData topRight;
+			DiamondSquareData bottomLeft;
+			DiamondSquareData bottomRight;
+
+			topLeft.uiTopLeftIndex = dtop.uiTopLeftIndex;
+			topLeft.uiBottomRightIndex = middleIndex;
+			topLeft.uiTopRightIndex = topIndex;
+			topLeft.uiBottomLeftIndex = leftIndex;
+
+			topRight.uiTopLeftIndex = topIndex;
+			topRight.uiTopRightIndex = dtop.uiTopRightIndex;
+			topRight.uiBottomLeftIndex = middleIndex;
+			topRight.uiBottomRightIndex = rightIndex;
+
+			bottomLeft.uiTopLeftIndex = rightIndex;
+			bottomLeft.uiTopRightIndex = middleIndex;
+			bottomLeft.uiBottomLeftIndex = dtop.uiBottomLeftIndex;
+			bottomLeft.uiBottomRightIndex = bottomIndex;
+
+			bottomRight.uiTopLeftIndex = middleIndex;
+			bottomRight.uiTopRightIndex = rightIndex;
+			bottomRight.uiBottomLeftIndex = bottomIndex;
+			bottomRight.uiBottomRightIndex = dtop.uiBottomRightIndex;
+
+			diamondStack.push(topLeft);
+			diamondStack.push(topRight);
+			diamondStack.push(bottomLeft);
+			diamondStack.push(bottomRight);
+
+			randomRange /= 2;
+			sideLength /= 2;
+		}
+	}
+
+
+	glGenTextures(1, &m_perlin_texture);
+	glBindTexture(GL_TEXTURE_2D, m_perlin_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, dimension, dimension, 0, GL_RED, GL_FLOAT, diamond_square_data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 }
 
 void Tutorial12::generateGrid( unsigned int rows, unsigned int cols ) 
@@ -241,8 +370,9 @@ void Tutorial12::Startup()
 
 //	loadFromFile();
 
-	dimensions = 64;
-	generatePerlin(dimensions);
+	dimensions = 65;
+	//generatePerlin(dimensions);
+	generateDiamondSquare(dimensions);
 	generateGrid(dimensions, dimensions);
 
 }

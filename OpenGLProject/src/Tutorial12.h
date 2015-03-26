@@ -47,4 +47,7 @@ private:
 	void setupShader4();
 
 	void generatePerlin(unsigned int dimension);
+	void generateDiamondSquare(unsigned int dimension);
+
+	float randomNumber();
 };
