@@ -44,8 +44,6 @@ void Tutorial4::Update()
 	float deltaTime = currentTime - previousTime;
 	previousTime = currentTime;
 	myCam.update(deltaTime);
-
-
 }
 
 void Tutorial4::Draw()

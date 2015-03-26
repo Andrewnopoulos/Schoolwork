@@ -9,10 +9,11 @@
 #include "Tutorial9.h"
 #include "Tutorial10.h"
 #include "Tutorial11.h"
+#include "Tutorial12.h"
 
 int main() {
 
-	auto tute = new Tutorial11();
+	auto tute = new Tutorial12();
 
 	tute->Run();
 

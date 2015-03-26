@@ -1,20 +1,51 @@
-#include "Tutorial2.h"
+#include "Tutorial12.h"
 #include "OBJLoader.h"
 #include "tiny_obj_loader.h"
 #include "ShaderManager.h"
 
-void Tutorial2::generateGrid( unsigned int rows, unsigned int cols ) 
+void Tutorial12::generatePerlin(unsigned int dimension)
 {
-	Vertex_a* aoVertices = new Vertex_a[ rows * cols ];
+	float* perlin_data = new float[dimension * dimension];
+	float scale = (1.0f / dimension) * 3;
+	int octaves = 6;
+	for (int x = 0; x < dimension; ++x)
+	{
+		for (int y = 0; y < dimension; ++y)
+		{
+
+			float amplitude = 1.0f;
+			float persistence = 0.3f;
+			perlin_data[y*dimension + x] = 0;
+
+			for (int o = 0; o < octaves; ++o)
+			{
+				float freq = powf(1, (float)o);
+				float perlin_sample =
+					glm::perlin(vec2((float)x, (float)y) * scale * freq) * 0.5f + 0.5f;
+				perlin_data[y * dimension + x] += perlin_sample * amplitude;
+				amplitude *= persistence;
+			}
+		}
+	}
+
+	glGenTextures(1, &m_perlin_texture);
+	glBindTexture(GL_TEXTURE_2D, m_perlin_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, dimension, dimension, 0, GL_RED, GL_FLOAT, perlin_data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+void Tutorial12::generateGrid( unsigned int rows, unsigned int cols ) 
+{
+	Vertex_b* aoVertices = new Vertex_b[ rows * cols ];
 	for( unsigned int r = 0; r < rows; ++r)
 	{
 		for( unsigned int c = 0; c < cols; ++c)
 		{
 			aoVertices[ r * cols + c ].position = vec4((float)c, 0, (float)r, 1);
-
-			// generate arbitrary colours for vertices
-			vec3 colour = vec3( sinf( (c / (float)(cols-1)) * ( r / (float)(rows-1))) );
-			aoVertices[ r * cols + c ].colour = vec4( colour, 1 );
+			aoVertices[r * cols + c].texIndex = vec2(((float)r / (rows - 1)), ((float)c / (cols - 1)));
 		}
 	}
 
@@ -50,15 +81,15 @@ void Tutorial2::generateGrid( unsigned int rows, unsigned int cols )
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
 
-	glBufferData(GL_ARRAY_BUFFER, ( rows * cols ) * sizeof(Vertex_a), aoVertices, GL_STATIC_DRAW );
+	glBufferData(GL_ARRAY_BUFFER, ( rows * cols ) * sizeof(Vertex_b), aoVertices, GL_STATIC_DRAW );
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (rows - 1) * (cols - 1) * 6 * sizeof(unsigned int), auiIndices, GL_STATIC_DRAW);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex_a), 0);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex_a), (void*)(sizeof(vec4)));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex_b), 0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_b), (void*)(sizeof(vec4)));
 
 	glBindVertexArray(0);
 
@@ -69,40 +100,7 @@ void Tutorial2::generateGrid( unsigned int rows, unsigned int cols )
 	delete[] auiIndices;
 }
 
-void Tutorial2::loadFromFile()
-{
-	OBJLoader loader;
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec2> uvs;
-	std::vector<glm::vec3> normals;
-	std::vector<unsigned int> indices;
-	bool res = loader.loadOBJ("../data/test.obj", vertices, uvs, normals, indices);
-
-	glGenVertexArrays(1, &m_VAO);
-	glGenBuffers(1, &m_VBO);
-	glGenBuffers(1, &m_IBO);
-
-	glBindVertexArray(m_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-	m_indexCount = indices.size();
-
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vec3), 0);
-
-	glBindVertexArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-}
-
-void Tutorial2::setupShader1()
+void Tutorial12::setupShader1()
 {
 	// create shaders
 	/*const char* vsSource = "#version 410\n \
@@ -158,7 +156,7 @@ void Tutorial2::setupShader1()
 	glDeleteShader(vertexShader);
 }
 
-void Tutorial2::setupShader2()
+void Tutorial12::setupShader2()
 {
 	// create shaders
 	/*const char* vsSource = "#version 410\n \
@@ -219,12 +217,17 @@ void Tutorial2::setupShader2()
 	glDeleteShader(vertexShader);
 }
 
-void Tutorial2::setupShader3()
+void Tutorial12::setupShader3()
 {
 	m_programID = m_shaderManager->LoadShader("Default", "../data/shaders/tut2.vert", "../data/shaders/tut2.frag");
 }
 
-void Tutorial2::Startup() 
+void Tutorial12::setupShader4()
+{
+	m_programID = m_shaderManager->LoadShader("Procedure", "../data/shaders/proc.vert", "../data/shaders/proc.frag");
+}
+
+void Tutorial12::Startup()
 {
 	myCam.SetInputWindow(window);
 
@@ -234,39 +237,42 @@ void Tutorial2::Startup()
 	myCam.setSpeed(20);
 	myCam.setRotationSpeed(0.1f);
 
-	setupShader1();
+	setupShader4();
 
 //	loadFromFile();
 
-	generateGrid(64, 64);
+	dimensions = 64;
+	generatePerlin(dimensions);
+	generateGrid(dimensions, dimensions);
+
 }
 
-void Tutorial2::Destroy() {}
-void Tutorial2::Update() 
+void Tutorial12::Destroy() {}
+
+void Tutorial12::Update() 
 {
 	currentTime = (float)glfwGetTime();
 	float deltaTime = currentTime - previousTime;
 	previousTime = currentTime;
 	myCam.update(deltaTime);
 }
-void Tutorial2::Draw() 
+void Tutorial12::Draw() 
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glUseProgram(m_programID);
 	unsigned int projectionViewUniform = glGetUniformLocation(m_programID,"ProjectionView"); // find uniform values in shaders
 	glUniformMatrix4fv(projectionViewUniform, 1, false, &myCam.getProjectionView()[0][0]); // set uniform values in shaders
 
-	unsigned int timeUniform = glGetUniformLocation(m_programID, "time");
-	glUniform1f(timeUniform, currentTime);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_perlin_texture);
 
-	unsigned int heightUniform = glGetUniformLocation(m_programID, "heightScale");
-	glUniform1f(heightUniform, 5);
-
-	unsigned int periodUniform = glGetUniformLocation(m_programID, "periodScale");
-	glUniform1f(periodUniform, 0.5);
+	unsigned int texloc = glGetUniformLocation(m_programID, "perlin_texture");
+	glUniform1i(texloc, 0);
 	
 	glBindVertexArray(m_VAO);
 
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // wireframe
+	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // wireframe
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
