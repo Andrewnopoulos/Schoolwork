@@ -13,6 +13,8 @@
 
 int main() {
 
+	srand(time(NULL));
+
 	auto tute = new Tutorial12();
 
 	tute->Run();

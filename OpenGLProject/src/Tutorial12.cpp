@@ -4,6 +4,9 @@
 #include "ShaderManager.h"
 
 #include <stack>
+#include <vector>
+#include <list>
+#include <algorithm>    // std::random_shuffle
 
 void Tutorial12::generatePerlin(unsigned int dimension)
 {
@@ -39,18 +42,18 @@ void Tutorial12::generatePerlin(unsigned int dimension)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
-float Tutorial12::randomNumber()
+float Tutorial12::randomNumber(float LO, float HI)
 {
-	return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	return LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 }
 
 void Tutorial12::generateDiamondSquare(unsigned int dimension)
 {
 	float* diamond_square_data = new float[dimension * dimension];
+	memset(diamond_square_data, 0, sizeof(float) * dimension * dimension);
 
-	float randomRange = 1;
-
-	srand(100);
+	float initials = 0.0f;
+	float roughness = 0.03f;
 
 	struct DiamondSquareData
 	{
@@ -58,10 +61,11 @@ void Tutorial12::generateDiamondSquare(unsigned int dimension)
 		unsigned int uiTopRightIndex;
 		unsigned int uiBottomLeftIndex;
 		unsigned int uiBottomRightIndex;
-
 	};
 
 	std::stack<DiamondSquareData> diamondStack;
+
+	std::list<DiamondSquareData> diamondList;
 
 	DiamondSquareData d;
 	d.uiTopLeftIndex = 0;
@@ -69,92 +73,278 @@ void Tutorial12::generateDiamondSquare(unsigned int dimension)
 	d.uiBottomLeftIndex = (dimension * (dimension - 1));
 	d.uiBottomRightIndex = (dimension * dimension) - 1;
 
-	diamondStack.push(d);
+//	diamondStack.push(d);
+//	DiamondSquareData init = diamondStack.top();
 
-	DiamondSquareData init = diamondStack.top();
+	diamondList.push_front(d);
+	DiamondSquareData init = diamondList.front();
 
-	diamond_square_data[init.uiTopLeftIndex] = randomNumber() * randomRange;
-	diamond_square_data[init.uiTopRightIndex] = randomNumber() * randomRange;
-	diamond_square_data[init.uiBottomLeftIndex] = randomNumber() * randomRange;
-	diamond_square_data[init.uiBottomRightIndex] = randomNumber() * randomRange;
+	diamond_square_data[init.uiTopLeftIndex] = randomNumber(-initials, initials);
+	diamond_square_data[init.uiTopRightIndex] = randomNumber(-initials, initials);
+	diamond_square_data[init.uiBottomLeftIndex] = randomNumber(-initials, initials);
+	diamond_square_data[init.uiBottomRightIndex] = randomNumber(-initials, initials);
 
-	while (!diamondStack.empty())
+	while (!diamondList.empty())
 	{
-		DiamondSquareData dtop = diamondStack.top();
-		diamondStack.pop();
+//		DiamondSquareData dtop = diamondStack.top();
+//		diamondStack.pop();
 
-		int sideLength = dtop.uiTopRightIndex - dtop.uiTopLeftIndex;
+		DiamondSquareData dtop = diamondList.front();
+		diamondList.pop_front();
 
-		unsigned int middleIndex = (dtop.uiTopLeftIndex + dtop.uiBottomRightIndex) / 2;
-		
-		diamond_square_data[middleIndex] =
-			(diamond_square_data[dtop.uiTopLeftIndex] +
-			diamond_square_data[dtop.uiTopRightIndex] +
-			diamond_square_data[dtop.uiBottomLeftIndex] +
-			diamond_square_data[dtop.uiBottomRightIndex]) / 4 + randomNumber() * randomRange;
+		unsigned int sideLength = dtop.uiTopRightIndex - dtop.uiTopLeftIndex;
 
-		unsigned int topIndex = dtop.uiTopLeftIndex + sideLength / 2;
-		unsigned int leftIndex = middleIndex - sideLength / 2;
-		unsigned int rightIndex = middleIndex + sideLength / 2;
-		unsigned int bottomIndex = dtop.uiBottomLeftIndex + sideLength / 2;
-
-		diamond_square_data[topIndex] =
-			(diamond_square_data[middleIndex] +
-			diamond_square_data[dtop.uiTopLeftIndex] +
-			diamond_square_data[dtop.uiTopRightIndex]) / 3 + randomNumber() * randomRange;
-
-		diamond_square_data[leftIndex] =
-			(diamond_square_data[middleIndex] +
-			diamond_square_data[dtop.uiTopLeftIndex] +
-			diamond_square_data[dtop.uiBottomLeftIndex]) / 3 + randomNumber() * randomRange;
-
-		diamond_square_data[rightIndex] =
-			(diamond_square_data[middleIndex] +
-			diamond_square_data[dtop.uiBottomRightIndex] +
-			diamond_square_data[dtop.uiTopRightIndex]) / 3 + randomNumber() * randomRange;
-
-		diamond_square_data[bottomIndex] =
-			(diamond_square_data[middleIndex] +
-			diamond_square_data[dtop.uiBottomLeftIndex] +
-			diamond_square_data[dtop.uiBottomRightIndex]) / 3 + randomNumber() * randomRange;
+		unsigned int halflength = sideLength / 2;
 
 		if (sideLength >= 2)
 		{
-			DiamondSquareData topLeft;
-			DiamondSquareData topRight;
-			DiamondSquareData bottomLeft;
-			DiamondSquareData bottomRight;
+			float randomRange = roughness * sideLength;
 
-			topLeft.uiTopLeftIndex = dtop.uiTopLeftIndex;
-			topLeft.uiBottomRightIndex = middleIndex;
-			topLeft.uiTopRightIndex = topIndex;
-			topLeft.uiBottomLeftIndex = leftIndex;
+			unsigned int middleIndex = (dtop.uiTopLeftIndex + dtop.uiBottomRightIndex) / 2;
 
-			topRight.uiTopLeftIndex = topIndex;
-			topRight.uiTopRightIndex = dtop.uiTopRightIndex;
-			topRight.uiBottomLeftIndex = middleIndex;
-			topRight.uiBottomRightIndex = rightIndex;
+			diamond_square_data[middleIndex] =
+				(diamond_square_data[dtop.uiTopLeftIndex] +
+				diamond_square_data[dtop.uiTopRightIndex] +
+				diamond_square_data[dtop.uiBottomLeftIndex] +
+				diamond_square_data[dtop.uiBottomRightIndex]) / 4 + randomNumber(-randomRange, randomRange);
 
-			bottomLeft.uiTopLeftIndex = rightIndex;
-			bottomLeft.uiTopRightIndex = middleIndex;
-			bottomLeft.uiBottomLeftIndex = dtop.uiBottomLeftIndex;
-			bottomLeft.uiBottomRightIndex = bottomIndex;
+			unsigned int topIndex = dtop.uiTopLeftIndex + halflength;
+			unsigned int leftIndex = middleIndex - halflength;
+			unsigned int rightIndex = middleIndex + halflength;
+			unsigned int bottomIndex = dtop.uiBottomLeftIndex + halflength;
 
-			bottomRight.uiTopLeftIndex = middleIndex;
-			bottomRight.uiTopRightIndex = rightIndex;
-			bottomRight.uiBottomLeftIndex = bottomIndex;
-			bottomRight.uiBottomRightIndex = dtop.uiBottomRightIndex;
+			//diamond_square_data[topIndex] =
+			//	//(diamond_square_data[middleIndex] +
+			//	(diamond_square_data[dtop.uiTopLeftIndex] +
+			//	diamond_square_data[dtop.uiTopRightIndex]) / 2;
 
-			diamondStack.push(topLeft);
-			diamondStack.push(topRight);
-			diamondStack.push(bottomLeft);
-			diamondStack.push(bottomRight);
+			//diamond_square_data[leftIndex] =
+			//	//(diamond_square_data[middleIndex] +
+			//	(diamond_square_data[dtop.uiTopLeftIndex] +
+			//	diamond_square_data[dtop.uiBottomLeftIndex]) / 2;
 
-			randomRange /= 2;
-			sideLength /= 2;
+			//diamond_square_data[rightIndex] =
+			//	//(diamond_square_data[middleIndex] +
+			//	(diamond_square_data[dtop.uiBottomRightIndex] +
+			//	diamond_square_data[dtop.uiTopRightIndex]) / 2;
+
+			//diamond_square_data[bottomIndex] =
+			//	//(diamond_square_data[middleIndex] +
+			//	(diamond_square_data[dtop.uiBottomLeftIndex] +
+			//	diamond_square_data[dtop.uiBottomRightIndex]) / 2;
+
+			int outTop = (middleIndex - dimension * sideLength);
+			int outBot = (middleIndex + dimension * sideLength);
+			int outLeft = (middleIndex - sideLength);
+			int outRight = (middleIndex + sideLength);
+
+			if (outTop < 0)
+			{
+				//outTop = (dimension * dimension) + outTop;
+				diamond_square_data[topIndex] =
+					(diamond_square_data[middleIndex] +
+					diamond_square_data[dtop.uiTopLeftIndex] +
+					diamond_square_data[dtop.uiTopRightIndex]) / 3 + randomNumber(-randomRange, randomRange);
+			}
+			else
+			{
+				diamond_square_data[topIndex] =
+					(diamond_square_data[middleIndex] +
+					diamond_square_data[dtop.uiTopLeftIndex] +
+					diamond_square_data[dtop.uiTopRightIndex] +
+					diamond_square_data[outTop]) / 4 + randomNumber(-randomRange, randomRange);
+			}
+
+			if (outBot >= (dimension * dimension))
+			{
+				//outBot -= (dimension * dimension);
+				diamond_square_data[bottomIndex] =
+					(diamond_square_data[middleIndex] +
+					diamond_square_data[dtop.uiBottomLeftIndex] +
+					diamond_square_data[dtop.uiBottomRightIndex]) / 3 + randomNumber(-randomRange, randomRange);
+			}
+			else
+			{
+				diamond_square_data[bottomIndex] =
+					(diamond_square_data[middleIndex] +
+					diamond_square_data[dtop.uiBottomLeftIndex] +
+					diamond_square_data[dtop.uiBottomRightIndex] +
+					diamond_square_data[outBot]) / 4 + randomNumber(-randomRange, randomRange);
+			}
+
+			int horizmin = (int)(middleIndex / dimension) * dimension;
+			int horizmax = horizmin + dimension - 1;
+
+			if (outLeft < horizmin)
+			{
+				//outLeft += dimension;
+				diamond_square_data[leftIndex] =
+					(diamond_square_data[middleIndex] +
+					diamond_square_data[dtop.uiTopLeftIndex] +
+					diamond_square_data[dtop.uiBottomLeftIndex]) / 3 + randomNumber(-randomRange, randomRange);
+			}
+			else
+			{
+				diamond_square_data[leftIndex] =
+					(diamond_square_data[middleIndex] +
+					diamond_square_data[dtop.uiTopLeftIndex] +
+					diamond_square_data[dtop.uiBottomLeftIndex] +
+					diamond_square_data[outLeft]) / 4 + randomNumber(-randomRange, randomRange);
+			}
+
+			if (outRight > horizmax)
+			{
+				//outRight -= dimension;
+				diamond_square_data[rightIndex] =
+					(diamond_square_data[middleIndex] +
+					diamond_square_data[dtop.uiBottomRightIndex] +
+					diamond_square_data[dtop.uiTopRightIndex]) / 3 + randomNumber(-randomRange, randomRange);
+			} 
+			else
+			{
+				diamond_square_data[rightIndex] =
+					(diamond_square_data[middleIndex] +
+					diamond_square_data[dtop.uiBottomRightIndex] +
+					diamond_square_data[dtop.uiTopRightIndex] +
+					diamond_square_data[outRight]) / 4 + randomNumber(-randomRange, randomRange);
+			}
+
+			//if (diamond_square_data[outTop] == 0)
+			//{
+			//	diamond_square_data[outTop] = randomNumber(-randomRange, randomRange);
+			//}
+			//if (diamond_square_data[outBot] == 0)
+			//{
+			//	diamond_square_data[outBot] = randomNumber(-randomRange, randomRange);
+			//}
+			//if (diamond_square_data[outLeft] == 0)
+			//{
+			//	diamond_square_data[outLeft] = randomNumber(-randomRange, randomRange);
+			//}
+			//if (diamond_square_data[outRight] == 0)
+			//{
+			//	diamond_square_data[outRight] = randomNumber(-randomRange, randomRange);
+			//}
+
+			//if (diamond_square_data[outTop] == 0)
+			//{
+			//	diamond_square_data[outTop] = 
+			//		(diamond_square_data[middleIndex] +
+			//		diamond_square_data[dtop.uiTopLeftIndex] +
+			//		diamond_square_data[dtop.uiTopRightIndex]) / 3;
+			//}
+			//if (diamond_square_data[outBot] == 0)
+			//{
+			//	diamond_square_data[outBot] = 
+			//		(diamond_square_data[middleIndex] +
+			//		diamond_square_data[dtop.uiBottomLeftIndex] +
+			//		diamond_square_data[dtop.uiBottomRightIndex]) / 3;
+			//}
+			//if (diamond_square_data[outLeft] == 0)
+			//{
+			//	diamond_square_data[outLeft] = 
+			//		(diamond_square_data[middleIndex] +
+			//		diamond_square_data[dtop.uiTopLeftIndex] +
+			//		diamond_square_data[dtop.uiBottomLeftIndex]) / 3;
+			//}
+			//if (diamond_square_data[outRight] == 0)
+			//{
+			//	diamond_square_data[outRight] = 
+			//		(diamond_square_data[middleIndex] +
+			//		diamond_square_data[dtop.uiBottomRightIndex] +
+			//		diamond_square_data[dtop.uiTopRightIndex]) / 3;
+			//}
+
+			//diamond_square_data[topIndex] =
+			//	(diamond_square_data[middleIndex] +
+			//	diamond_square_data[dtop.uiTopLeftIndex] +
+			//	diamond_square_data[dtop.uiTopRightIndex] + 
+			//	diamond_square_data[outTop]) / 4 + randomNumber(-randomRange, randomRange);
+			//
+			//diamond_square_data[leftIndex] =
+			//	(diamond_square_data[middleIndex] +
+			//	diamond_square_data[dtop.uiTopLeftIndex] +
+			//	diamond_square_data[dtop.uiBottomLeftIndex] +
+			//	diamond_square_data[outLeft]) / 4 + randomNumber(-randomRange, randomRange);
+			//
+			//diamond_square_data[rightIndex] =
+			//	(diamond_square_data[middleIndex] +
+			//	diamond_square_data[dtop.uiBottomRightIndex] +
+			//	diamond_square_data[dtop.uiTopRightIndex] +
+			//	diamond_square_data[outRight]) / 4 + randomNumber(-randomRange, randomRange);
+			//
+			//diamond_square_data[bottomIndex] =
+			//	(diamond_square_data[middleIndex] +
+			//	diamond_square_data[dtop.uiBottomLeftIndex] +
+			//	diamond_square_data[dtop.uiBottomRightIndex] +
+			//	diamond_square_data[outBot]) / 4 + randomNumber(-randomRange, randomRange);
+
+			if (sideLength >= 3)
+			{
+				DiamondSquareData topLeft;
+				DiamondSquareData topRight;
+				DiamondSquareData bottomLeft;
+				DiamondSquareData bottomRight;
+
+				topLeft.uiTopLeftIndex = dtop.uiTopLeftIndex;
+				topLeft.uiBottomRightIndex = middleIndex;
+				topLeft.uiTopRightIndex = topIndex;
+				topLeft.uiBottomLeftIndex = leftIndex;
+
+				topRight.uiTopLeftIndex = topIndex;
+				topRight.uiTopRightIndex = dtop.uiTopRightIndex;
+				topRight.uiBottomLeftIndex = middleIndex;
+				topRight.uiBottomRightIndex = rightIndex;
+
+				bottomLeft.uiTopLeftIndex = leftIndex;
+				bottomLeft.uiTopRightIndex = middleIndex;
+				bottomLeft.uiBottomLeftIndex = dtop.uiBottomLeftIndex;
+				bottomLeft.uiBottomRightIndex = bottomIndex;
+
+				bottomRight.uiTopLeftIndex = middleIndex;
+				bottomRight.uiTopRightIndex = rightIndex;
+				bottomRight.uiBottomLeftIndex = bottomIndex;
+				bottomRight.uiBottomRightIndex = dtop.uiBottomRightIndex;
+
+				//std::vector<DiamondSquareData> tempVec;
+				//tempVec.push_back(topLeft);
+				//tempVec.push_back(bottomLeft);
+				//tempVec.push_back(topRight);
+				//tempVec.push_back(bottomRight);
+
+				//std::random_shuffle(tempVec.begin(), tempVec.end());
+
+				//for (auto it = tempVec.begin(); it != tempVec.end(); ++it)
+				//{
+				//	diamondStack.push(*it);
+				//}
+
+				diamondList.push_back(topLeft);
+				diamondList.push_back(bottomLeft);
+				diamondList.push_back(topRight);
+				diamondList.push_back(bottomRight);
+			}
 		}
 	}
 
+	//for (int i = 1; i < dimensions - 1; i++)
+	//{
+	//	for (int j = 1; j < dimensions - 1; j++)
+	//	{
+	//		float tex = diamond_square_data[i + dimensions*j];
+	//		tex = tex * 4;
+	//		tex += diamond_square_data[(i - 1) + dimensions*(j - 1)];
+	//		tex += diamond_square_data[(i - 1) + dimensions*(j)] * 2;
+	//		tex += diamond_square_data[(i - 1) + dimensions*(j + 1)];
+	//		tex += diamond_square_data[(i) + dimensions*(j - 1)] * 2;
+	//		tex += diamond_square_data[(i) + dimensions*(j + 1)] * 2;
+	//		tex += diamond_square_data[(i + 1) + dimensions*(j - 1)];
+	//		tex += diamond_square_data[(i + 1) + dimensions*(j)] * 2;
+	//		tex += diamond_square_data[(i + 1) + dimensions*(j + 1)];
+	//		tex = tex / 16.0f;
+	//		diamond_square_data[i + dimensions*j] = tex;
+	//	}
+	//}
 
 	glGenTextures(1, &m_perlin_texture);
 	glBindTexture(GL_TEXTURE_2D, m_perlin_texture);
@@ -360,17 +550,17 @@ void Tutorial12::Startup()
 {
 	myCam.SetInputWindow(window);
 
-	myCam.setPerspective(glm::pi<float>() * 0.25f, 16/9.0f, 0.1f, 1000.0f);
+	myCam.setPerspective(glm::pi<float>() * 0.25f, 16/9.0f, 0.1f, 3000.0f);
 	myCam.setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
 
-	myCam.setSpeed(20);
+	myCam.setSpeed(200);
 	myCam.setRotationSpeed(0.1f);
 
 	setupShader4();
 
 //	loadFromFile();
 
-	dimensions = 65;
+	dimensions = 129;
 	//generatePerlin(dimensions);
 	generateDiamondSquare(dimensions);
 	generateGrid(dimensions, dimensions);

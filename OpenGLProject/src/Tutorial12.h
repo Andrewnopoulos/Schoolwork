@@ -49,5 +49,5 @@ private:
 	void generatePerlin(unsigned int dimension);
 	void generateDiamondSquare(unsigned int dimension);
 
-	float randomNumber();
+	float randomNumber(float LO, float HI);
 };
