@@ -12,7 +12,7 @@ void main() {
 	vec4 white = vec4(1);
 	vec4 black = vec4(0,0,0,1);
 	
-	vec4 outColour = mix(black, white, vPos.y/10 + 0.5);
-	FragColor = texture(perlin_texture, frag_texcoord).rrrr;
+	vec4 outColour = mix(black, white, vPos.y/60 + 0.5);
+	FragColor = outColour;
 	FragColor.a = 1; 
 }

@@ -553,14 +553,14 @@ void Tutorial12::Startup()
 	myCam.setPerspective(glm::pi<float>() * 0.25f, 16/9.0f, 0.1f, 3000.0f);
 	myCam.setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
 
-	myCam.setSpeed(200);
+	myCam.setSpeed(100);
 	myCam.setRotationSpeed(0.1f);
 
 	setupShader4();
 
 //	loadFromFile();
 
-	dimensions = 129;
+	dimensions = 65;
 	//generatePerlin(dimensions);
 	generateDiamondSquare(dimensions);
 	generateGrid(dimensions, dimensions);
