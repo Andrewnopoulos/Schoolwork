@@ -98,7 +98,7 @@ void Tutorial12::generateDiamondSquare(unsigned int dimension)
 		unsigned int sideLength = dtop.uiTopRightIndex - dtop.uiTopLeftIndex;
 
 		unsigned int halflength = sideLength / 2;
-
+		
 		if (sideLength >= 2)
 		{
 			float randomRange = roughness * sideLength;
