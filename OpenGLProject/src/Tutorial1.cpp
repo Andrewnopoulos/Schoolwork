@@ -10,6 +10,7 @@ void Tutorial1::Startup()
 	myCam.setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
 
 	myCam.setSpeed(5);
+	myCam.setRotationSpeed(10);
 
 	currentTime = 0;
 	previousTime = 0;

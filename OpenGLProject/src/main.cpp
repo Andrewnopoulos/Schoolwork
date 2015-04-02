@@ -12,11 +12,13 @@
 #include "Tutorial12.h" // procedural terrain generation
 #include "Tutorial13.h" // realistic lighting
 
+#include "Assignment1.h"
+
 int main() {
 
 	srand(time(NULL));
 
-	auto tute = new Tutorial13();
+	auto tute = new Tutorial11();
 
 	tute->Run();
 
