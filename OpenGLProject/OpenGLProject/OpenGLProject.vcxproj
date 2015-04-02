@@ -96,6 +96,7 @@
     <ClCompile Include="..\src\Tutorial10.cpp" />
     <ClCompile Include="..\src\Tutorial11.cpp" />
     <ClCompile Include="..\src\Tutorial12.cpp" />
+    <ClCompile Include="..\src\Tutorial13.cpp" />
     <ClCompile Include="..\src\Tutorial2.cpp" />
     <ClCompile Include="..\src\Tutorial3.cpp" />
     <ClCompile Include="..\src\Tutorial4.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="..\src\Tutorial10.h" />
     <ClInclude Include="..\src\Tutorial11.h" />
     <ClInclude Include="..\src\Tutorial12.h" />
+    <ClInclude Include="..\src\Tutorial13.h" />
     <ClInclude Include="..\src\Tutorial2.h" />
     <ClInclude Include="..\src\Tutorial3.h" />
     <ClInclude Include="..\src\Tutorial4.h" />

@@ -1,21 +1,22 @@
 #include "Tutorial1.h"
-#include "Tutorial2.h"
+#include "Tutorial2.h" // shaders
 #include "Tutorial3.h"
-#include "Tutorial4.h"
-#include "Tutorial5.h"
-#include "Tutorial6.h"
-#include "Tutorial7.h"
-#include "Tutorial8.h"
-#include "Tutorial9.h"
-#include "Tutorial10.h"
-#include "Tutorial11.h"
-#include "Tutorial12.h"
+#include "Tutorial4.h" // texture
+#include "Tutorial5.h" // normal map
+#include "Tutorial6.h" // animation
+#include "Tutorial7.h" // animated model (with lighting)
+#include "Tutorial8.h" // cpu particles
+#include "Tutorial9.h" // gpu particles
+#include "Tutorial10.h" // post processing effects
+#include "Tutorial11.h" // shadows (with animated model)
+#include "Tutorial12.h" // procedural terrain generation
+#include "Tutorial13.h" // realistic lighting
 
 int main() {
 
 	srand(time(NULL));
 
-	auto tute = new Tutorial12();
+	auto tute = new Tutorial13();
 
 	tute->Run();
 

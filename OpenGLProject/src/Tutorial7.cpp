@@ -9,6 +9,7 @@ void Tutorial7::Startup()
 	myCam.setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
 
 	myCam.setSpeed(700);
+	myCam.setRotationSpeed(0.1f);
 
 	m_fbx = new FBXFile();
 	m_fbx->load("../data/characters/Pyro/pyro.fbx");

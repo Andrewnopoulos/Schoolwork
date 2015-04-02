@@ -15,6 +15,7 @@ uniform sampler2D diffuse;
 uniform sampler2D normal;
 uniform sampler2D shadowMap;
 uniform float SpecPow;
+uniform float shadowBias;
 
 void main() 
 {
@@ -34,7 +35,7 @@ void main()
 //	s = pow( s, SpecPow );
 	
 	float d = max(0, dot(normalize(vNormal.xyz), LightDir));
-	if (texture(shadowMap, vShadowCoord.xy).r < vShadowCoord.z) {
+	if (texture(shadowMap, vShadowCoord.xy).r < vShadowCoord.z - shadowBias) {
 		d = 0;
 	}
 	

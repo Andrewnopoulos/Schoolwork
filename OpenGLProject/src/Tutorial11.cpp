@@ -22,7 +22,7 @@ void Tutorial11::Startup()
 
 	setupVerts();
 
-	setupShadowMap();
+	setupShadowMap(); 
 
 	loadTextures();
 }
@@ -34,8 +34,8 @@ void Tutorial11::Update()
 	previousTime = currentTime;
 	myCam.update(deltaTime);
 
-	glm::mat4 lightProjection = glm::ortho<float>(-20000, 20000,
-		-20000, 20000, -20000, 20000);
+	glm::mat4 lightProjection = glm::ortho<float>(-2000, 2000,
+		-2000, 2000, -2000, 2000);
 
 	glm::mat4 lightView = glm::lookAt(m_lightDirection,
 		glm::vec3(0), glm::vec3(0, 1, 0));
@@ -131,6 +131,9 @@ void Tutorial11::Draw()
 
 	int specular_uniform = glGetUniformLocation(m_programID, "SpecPow");
 	glUniform1f(specular_uniform, 12);
+
+	int shadowbias = glGetUniformLocation(m_programID, "shadowBias");
+	glUniform1f(shadowbias, 0.1f);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_texture);

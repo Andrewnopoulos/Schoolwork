@@ -52,7 +52,10 @@ void Tutorial12::generateDiamondSquare(unsigned int dimension)
 	float* diamond_square_data = new float[dimension * dimension];
 	memset(diamond_square_data, 0, sizeof(float) * dimension * dimension);
 
-	float initials = 0.0f;
+	float* diamond_square_temp = new float[dimension * dimension];
+	memset(diamond_square_temp, 0, sizeof(float)* dimension * dimension);
+
+	float initials = 0.7f;
 	float roughness = 0.03f;
 
 	struct DiamondSquareData
@@ -327,28 +330,39 @@ void Tutorial12::generateDiamondSquare(unsigned int dimension)
 		}
 	}
 
-	//for (int i = 1; i < dimensions - 1; i++)
-	//{
-	//	for (int j = 1; j < dimensions - 1; j++)
-	//	{
-	//		float tex = diamond_square_data[i + dimensions*j];
-	//		tex = tex * 4;
-	//		tex += diamond_square_data[(i - 1) + dimensions*(j - 1)];
-	//		tex += diamond_square_data[(i - 1) + dimensions*(j)] * 2;
-	//		tex += diamond_square_data[(i - 1) + dimensions*(j + 1)];
-	//		tex += diamond_square_data[(i) + dimensions*(j - 1)] * 2;
-	//		tex += diamond_square_data[(i) + dimensions*(j + 1)] * 2;
-	//		tex += diamond_square_data[(i + 1) + dimensions*(j - 1)];
-	//		tex += diamond_square_data[(i + 1) + dimensions*(j)] * 2;
-	//		tex += diamond_square_data[(i + 1) + dimensions*(j + 1)];
-	//		tex = tex / 16.0f;
-	//		diamond_square_data[i + dimensions*j] = tex;
-	//	}
-	//}
+
+
+	for (int i = 0; i < dimensions; i++)
+	{
+		for (int j = 0; j < dimensions; j++)
+		{
+			if (i == 0 || j == 0 || i == dimensions - 1 || j == dimensions - 1)
+			{
+				diamond_square_temp[i + dimensions*j] = diamond_square_data[i+dimensions*j];
+			}
+			else
+			{
+				float tex = diamond_square_data[i + dimensions*j];
+				tex = tex * 4;
+				tex += diamond_square_data[(i - 1) + dimensions*(j - 1)];
+				tex += diamond_square_data[(i - 1) + dimensions*(j)] * 2;
+				tex += diamond_square_data[(i - 1) + dimensions*(j + 1)];
+				tex += diamond_square_data[(i)+dimensions*(j - 1)] * 2;
+				tex += diamond_square_data[(i)+dimensions*(j + 1)] * 2;
+				tex += diamond_square_data[(i + 1) + dimensions*(j - 1)];
+				tex += diamond_square_data[(i + 1) + dimensions*(j)] * 2;
+				tex += diamond_square_data[(i + 1) + dimensions*(j + 1)];
+				tex = tex / 16.0f;
+				diamond_square_temp[i + dimensions*j] = tex;
+			}
+
+			
+		}
+	}
 
 	glGenTextures(1, &m_perlin_texture);
 	glBindTexture(GL_TEXTURE_2D, m_perlin_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, dimension, dimension, 0, GL_RED, GL_FLOAT, diamond_square_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, dimension, dimension, 0, GL_RED, GL_FLOAT, diamond_square_temp);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -364,7 +378,7 @@ void Tutorial12::generateGrid( unsigned int rows, unsigned int cols )
 		for( unsigned int c = 0; c < cols; ++c)
 		{
 			aoVertices[ r * cols + c ].position = vec4((float)c, 0, (float)r, 1);
-			aoVertices[r * cols + c].texIndex = vec2(((float)r / (rows - 1)), ((float)c / (cols - 1)));
+			aoVertices[ r * cols + c ].texIndex = vec2(((float)r / (rows - 1)), ((float)c / (cols - 1)));
 		}
 	}
 
@@ -560,7 +574,7 @@ void Tutorial12::Startup()
 
 //	loadFromFile();
 
-	dimensions = 65;
+	dimensions = 257;
 	//generatePerlin(dimensions);
 	generateDiamondSquare(dimensions);
 	generateGrid(dimensions, dimensions);
