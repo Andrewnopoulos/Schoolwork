@@ -38,6 +38,7 @@ private:
 	unsigned int m_ter_VBO;
 	unsigned int m_ter_IBO;
 
+	float* m_terrainData;
 	unsigned int m_terrainTextureMap;
 	unsigned int m_terrainShader;
 

@@ -132,7 +132,7 @@ void Assignment1::SetupScene()
 	int dimensions = 257;
 
 	// get max height of terrain
-	m_terrainGen->SetMaxHeight(4.0f);
+	m_terrainGen->SetMaxHeight(80.0f);
 
 	SetupTerrainShader();
 	GenerateTerrain(dimensions, 1);
@@ -146,21 +146,20 @@ void Assignment1::SetupTerrainShader()
 
 void Assignment1::GenerateTerrain(unsigned int dimensions, int method)
 {
-	float* terrain_data;
 	if (method)
 	{
 		// ask for roughness and smoothing
-		terrain_data = m_terrainGen->GenerateDiamondSquare(dimensions, 0.03f, false);
+		m_terrainData = m_terrainGen->GenerateDiamondSquare(dimensions, 0.3f, true);
 	}
 	else
 	{
 		// ask how many octaves
-		terrain_data = m_terrainGen->GeneratePerlin(dimensions, 6);
+		m_terrainData = m_terrainGen->GeneratePerlin(dimensions, 6);
 	}
 
 	glGenTextures(1, &m_terrainTextureMap);
 	glBindTexture(GL_TEXTURE_2D, m_terrainTextureMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, dimensions, dimensions, 0, GL_RED, GL_FLOAT, terrain_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, dimensions, dimensions, 0, GL_RED, GL_FLOAT, m_terrainData);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -174,11 +173,31 @@ void Assignment1::GenerateGrid(unsigned int rows, unsigned int cols)
 	{
 		for (unsigned int c = 0; c < cols; ++c)
 		{
-			aoVertices[r * cols + c].position = vec4((float)c, 0, (float)r, 1);
+			aoVertices[r * cols + c].position = vec4((float)c, m_terrainData[r * cols + c], (float)r, 1);
 			aoVertices[r * cols + c].normal = vec4(0, 1, 0, 1);
 			aoVertices[r * cols + c].texIndex = vec2(((float)r / (rows - 1)), ((float)c / (cols - 1)));
 		}
 	}
+
+
+	for (unsigned int r = 0; r < rows; ++r)
+	{
+		for (unsigned int c = 0; c < cols; ++c)
+		{
+			vec3 a = aoVertices[r * cols + c].position.xyz;
+			vec3 b;
+			vec3 d;
+			if (r != rows - 1 && c != cols - 1)
+			{
+				b = aoVertices[(r + 1) * cols + c].position.xyz;
+				d = aoVertices[(r + 1) * cols + (c + 1)].position.xyz;
+				//aoVertices[r * cols + c].normal = vec4(glm::normalize(glm::cross(d - a, b - a)), 1);
+				aoVertices[r * cols + c].normal = vec4(glm::normalize(glm::cross(b - a, d - a)), 1);
+			}
+		}
+	}
+
+
 
 	// defining index count based off quad count (2 triangles per quad)
 	unsigned int* auiIndices = new unsigned int[(rows - 1) * (cols - 1) * 6];

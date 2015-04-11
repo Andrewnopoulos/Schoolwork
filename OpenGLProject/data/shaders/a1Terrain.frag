@@ -22,18 +22,22 @@ void main() {
 	vec4 grass = texture(grassTexture, frag_texcoord * 16);
 	vec4 snow = texture(snowTexture, frag_texcoord * 16);
 	
-	float fscale = vPos.y / (maxHeight*8);
+	float fscale = vPos.y / (maxHeight);
 	
 	const float range1 = 0.4f;
 	const float range2 = 0.5f;
 	const float range3 = 0.65f;
-	const float range4 = 0.85f;
+	const float range4 = 0.75f;
 	
 	vec4 outColour = black;
 	
 	if (fscale >= 0.0 && fscale <= range1)
 	{
 		outColour = grass;
+		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < 0.8)
+		{
+			outColour = sand;
+		}
 	}else if (fscale <= range2)
 	{
 		fscale -= range1;
@@ -43,6 +47,10 @@ void main() {
 		
 		outColour += grass * fscale;
 		outColour += sand * fscale2;
+		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < 0.8)
+		{
+			outColour = sand;
+		}
 	}else if (fscale <= range3)
 	{
 		outColour = sand;

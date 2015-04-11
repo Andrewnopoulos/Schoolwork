@@ -14,7 +14,7 @@ uniform mat4 ProjectionView;
 void main() {
 
 	vec4 pos = Position;
-	pos.y += texture(heightMap, texcoord).r * 10;
+//	pos.y += texture(heightMap, texcoord).r * 10;
 
 	frag_texcoord = texcoord;
 	gl_Position = ProjectionView * pos; 
