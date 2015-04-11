@@ -24,5 +24,4 @@ int main() {
 
 	delete tute;
 	return 0;
-
 }

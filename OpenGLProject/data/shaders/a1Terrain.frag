@@ -28,13 +28,14 @@ void main() {
 	const float range2 = 0.5f;
 	const float range3 = 0.65f;
 	const float range4 = 0.75f;
+	const float cliffBound = 0.8;
 	
 	vec4 outColour = black;
 	
 	if (fscale >= 0.0 && fscale <= range1)
 	{
 		outColour = grass;
-		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < 0.8)
+		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < cliffBound)
 		{
 			outColour = sand;
 		}
@@ -47,7 +48,7 @@ void main() {
 		
 		outColour += grass * fscale;
 		outColour += sand * fscale2;
-		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < 0.8)
+		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < cliffBound)
 		{
 			outColour = sand;
 		}

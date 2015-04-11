@@ -136,7 +136,8 @@ void Assignment1::SetupScene()
 
 	SetupTerrainShader();
 	GenerateTerrain(dimensions, 1);
-	GenerateGrid(dimensions, dimensions);
+
+
 }
 
 void Assignment1::SetupTerrainShader()
@@ -164,6 +165,8 @@ void Assignment1::GenerateTerrain(unsigned int dimensions, int method)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	GenerateGrid(dimensions, dimensions);
 }
 
 void Assignment1::GenerateGrid(unsigned int rows, unsigned int cols)
@@ -179,7 +182,7 @@ void Assignment1::GenerateGrid(unsigned int rows, unsigned int cols)
 		}
 	}
 
-
+	// calculate normals
 	for (unsigned int r = 0; r < rows; ++r)
 	{
 		for (unsigned int c = 0; c < cols; ++c)
@@ -191,7 +194,6 @@ void Assignment1::GenerateGrid(unsigned int rows, unsigned int cols)
 			{
 				b = aoVertices[(r + 1) * cols + c].position.xyz;
 				d = aoVertices[(r + 1) * cols + (c + 1)].position.xyz;
-				//aoVertices[r * cols + c].normal = vec4(glm::normalize(glm::cross(d - a, b - a)), 1);
 				aoVertices[r * cols + c].normal = vec4(glm::normalize(glm::cross(b - a, d - a)), 1);
 			}
 		}
