@@ -18,7 +18,7 @@ int main() {
 
 	srand(time(NULL));
 
-	auto tute = new Tutorial12();
+	auto tute = new Assignment1();
 
 	tute->Run();
 

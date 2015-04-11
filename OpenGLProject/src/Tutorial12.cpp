@@ -331,8 +331,6 @@ void Tutorial12::generateDiamondSquare(unsigned int dimension)
 		}
 	}
 
-
-
 	for (int i = 0; i < dimensions; i++)
 	{
 		for (int j = 0; j < dimensions; j++)

@@ -92,6 +92,7 @@
     <ClCompile Include="..\src\OBJLoader.cpp" />
     <ClCompile Include="..\src\ParticleEmitter.cpp" />
     <ClCompile Include="..\src\ShaderManager.cpp" />
+    <ClCompile Include="..\src\TerrainGenerator.cpp" />
     <ClCompile Include="..\src\tiny_obj_loader.cc" />
     <ClCompile Include="..\src\Tutorial1.cpp" />
     <ClCompile Include="..\src\Tutorial10.cpp" />
@@ -118,6 +119,7 @@
     <ClInclude Include="..\src\OBJLoader.h" />
     <ClInclude Include="..\src\ParticleEmitter.h" />
     <ClInclude Include="..\src\ShaderManager.h" />
+    <ClInclude Include="..\src\TerrainGenerator.h" />
     <ClInclude Include="..\src\tiny_obj_loader.h" />
     <ClInclude Include="..\src\Tutorial1.h" />
     <ClInclude Include="..\src\Tutorial10.h" />

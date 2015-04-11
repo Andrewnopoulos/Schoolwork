@@ -96,6 +96,9 @@
     <ClCompile Include="..\src\Assignment1.cpp">
       <Filter>Source Files\Tutorials</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\TerrainGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gl_core_4_4.h">
@@ -169,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Assignment1.h">
       <Filter>Header Files\Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\TerrainGenerator.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
