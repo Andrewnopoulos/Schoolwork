@@ -5,6 +5,7 @@
 #include "TerrainGenerator.h"
 #include "ShaderManager.h"
 
+
 using glm::vec2;
 using glm::vec3;
 using glm::vec4;
@@ -53,5 +54,14 @@ private:
 	unsigned int m_snowTexture;
 
 	void LoadTextures();
-	
+
+	void SetupSkyboxShader();
+	void LoadSkybox();
+	void DrawSkybox();
+
+	unsigned int m_skyboxShader;
+	unsigned int m_skyboxTexture;
+
+	unsigned int m_skyboxVAO, m_skyboxVBO;
+
 };

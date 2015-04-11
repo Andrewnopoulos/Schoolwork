@@ -1,5 +1,6 @@
 #include "Assignment1.h"
 #include <stb_image.h>
+#include <vector>
 
 void Assignment1::Startup()
 {
@@ -34,6 +35,9 @@ void Assignment1::Update()
 void Assignment1::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	DrawSkybox();
+
 	DrawTerrain();
 }
 
@@ -137,12 +141,137 @@ void Assignment1::SetupScene()
 	SetupTerrainShader();
 	GenerateTerrain(dimensions, 1);
 
+	SetupSkyboxShader();
+	LoadSkybox();
 
+}
+
+void Assignment1::DrawSkybox()
+{
+	glDepthMask(GL_FALSE);
+	glUseProgram(m_skyboxShader);
+
+	unsigned int projectionUniform = glGetUniformLocation(m_skyboxShader,
+		"Projection"); // find uniform values in shaders
+	glUniformMatrix4fv(projectionUniform, 1, 
+		false, &m_camera->getProjection()[0][0]); // set uniform values in shaders
+
+	unsigned int viewUniform = glGetUniformLocation(m_skyboxShader,
+		"View"); // find uniform values in shaders
+	glUniformMatrix4fv(viewUniform, 1,
+		false, &m_camera->getView()[0][0]); // set uniform values in shaders
+
+	glBindVertexArray(m_skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(m_skyboxShader, "skybox"), 0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_skyboxTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthMask(GL_TRUE);
+}
+
+void Assignment1::SetupSkyboxShader()
+{
+	m_skyboxShader = m_shaderManager->LoadShader(
+		"Skybox", 
+		"../data/shaders/skybox.vert", 
+		"../data/shaders/skybox.frag");
 }
 
 void Assignment1::SetupTerrainShader()
 {
-	m_terrainShader = m_shaderManager->LoadShader("Terrain", "../data/shaders/a1Terrain.vert", "../data/shaders/a1Terrain.frag");
+	m_terrainShader = m_shaderManager->LoadShader(
+		"Terrain", 
+		"../data/shaders/a1Terrain.vert", 
+		"../data/shaders/a1Terrain.frag");
+}
+
+void Assignment1::LoadSkybox()
+{
+	float skyboxVertices[] = {
+		// Positions          
+		-1.0f, 1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, 1.0f, -1.0f,
+		-1.0f, 1.0f, -1.0f,
+
+		-1.0f, -1.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, 1.0f, -1.0f,
+		-1.0f, 1.0f, -1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, -1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f,
+
+		-1.0f, 1.0f, -1.0f,
+		1.0f, 1.0f, -1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, 1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, 1.0f,
+		1.0f, -1.0f, 1.0f
+	};
+
+	std::vector<char*> faces;
+	faces.push_back("../data/textures/skybox/right.tga");
+	faces.push_back("../data/textures/skybox/left.tga");
+	faces.push_back("../data/textures/skybox/top.tga");
+	faces.push_back("../data/textures/skybox/bottom.tga");
+	faces.push_back("../data/textures/skybox/back.tga");
+	faces.push_back("../data/textures/skybox/front.tga");
+
+	glGenVertexArrays(1, &m_skyboxVAO);
+	glGenBuffers(1, &m_skyboxVBO);
+	glBindVertexArray(m_skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glBindVertexArray(0);
+
+	glGenTextures(1, &m_skyboxTexture);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_skyboxTexture);
+
+	int width, height, imageformat;
+	unsigned char* image;
+
+	for (int i = 0; i < faces.size(); i++)
+	{
+		image = stbi_load(faces[i], &width, &height, &imageformat, STBI_default);
+		glTexImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+			GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void Assignment1::GenerateTerrain(unsigned int dimensions, int method)
