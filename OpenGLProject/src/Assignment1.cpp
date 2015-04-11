@@ -175,6 +175,7 @@ void Assignment1::GenerateGrid(unsigned int rows, unsigned int cols)
 		for (unsigned int c = 0; c < cols; ++c)
 		{
 			aoVertices[r * cols + c].position = vec4((float)c, 0, (float)r, 1);
+			aoVertices[r * cols + c].normal = vec4(0, 1, 0, 1);
 			aoVertices[r * cols + c].texIndex = vec2(((float)r / (rows - 1)), ((float)c / (cols - 1)));
 		}
 	}
@@ -217,9 +218,11 @@ void Assignment1::GenerateGrid(unsigned int rows, unsigned int cols)
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(terrainVert), 0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(terrainVert), (void*)(sizeof(vec4)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(terrainVert), (void*)(sizeof(vec4)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(terrainVert), (void*)(2 * sizeof(vec4)));
 
 	glBindVertexArray(0);
 

@@ -13,6 +13,7 @@ using glm::mat4;
 struct terrainVert
 {
 	vec4 position;
+	vec4 normal;
 	vec2 texIndex;
 };
 

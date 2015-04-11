@@ -2,6 +2,7 @@
 
 in vec2 frag_texcoord;
 in vec4 vPos;
+in vec4 vNormal;
 
 out vec4 FragColor;
 
@@ -59,8 +60,10 @@ void main() {
 		outColour = snow;
 	}
 	
+	float d = max(0, dot(normalize(vNormal.xyz), vec3(0, 1, 0)));
 	// vec4 outColour = mix(black, white, vPos.y/60 + 0.7);
 	
 	FragColor = outColour;
+	FragColor.rgb = FragColor.rgb * d;
 	FragColor.a = 1; 
 }
