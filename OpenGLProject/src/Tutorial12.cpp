@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include <algorithm>    // std::random_shuffle
+#include <iostream>
 
 void Tutorial12::generatePerlin(unsigned int dimension)
 {
@@ -568,7 +569,7 @@ void Tutorial12::Startup()
 	myCam.setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
 
 	myCam.setSpeed(100);
-	myCam.setRotationSpeed(0.1f);
+	myCam.setRotationSpeed(10.0f);
 
 	setupShader4();
 
