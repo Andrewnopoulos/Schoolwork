@@ -17,23 +17,29 @@ void TerrainGenerator::SetMaxHeight(float a_heightMax)
 
 void TerrainGenerator::Normalize(float * data, unsigned int size)
 {
-	float largestOffset = 0;
-	// find largest offset
+	float maxVal = 0;
+	float minVal = 0;
+	// find largest and smallest values
 	for (int i = 0; i < size; i++)
 	{
-		if (abs(data[i]) > largestOffset)
+		if (data[i] > maxVal)
 		{
-			largestOffset = abs(data[i]);
+			maxVal = data[i];
+		}
+		if (data[i] < minVal)
+		{
+			minVal = data[i];
 		}
 	}
-
+	float totalHighest = abs(maxVal) + abs(minVal);
+	minVal = abs(minVal);
 	// normalize and multiply by height max
 	for (int i = 0; i < size; i++)
 	{
-		data[i] /= largestOffset;
+		data[i] += minVal;
+		data[i] /= totalHighest;
 		data[i] *= heightMax;
 	}
-
 }
 
 float* TerrainGenerator::GeneratePerlin(const int dimension, const int octaves)

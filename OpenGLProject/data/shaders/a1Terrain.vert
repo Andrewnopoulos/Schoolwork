@@ -6,13 +6,13 @@ layout(location=1) in vec2 texcoord;
 out vec4 vPos;
 out vec2 frag_texcoord;
 
-uniform sampler2D perlin_texture;
+uniform sampler2D heightMap;
 uniform mat4 ProjectionView;
 
 void main() {
 
 	vec4 pos = Position;
-	pos.y += texture(perlin_texture, texcoord).r * 10;
+	pos.y += texture(heightMap, texcoord).r * 10;
 
 	frag_texcoord = texcoord;
 	gl_Position = ProjectionView * pos; 

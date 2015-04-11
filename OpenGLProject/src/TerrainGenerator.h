@@ -10,6 +10,11 @@ public:
 
 	void SetMaxHeight(float a_heightMax);
 
+	inline float GetMaxHeight()
+	{
+		return heightMax;
+	}
+
 	/*
 		Generates an array of size dimensions x dimensions using the Perlin Noise generation technique
 		Changing the number of octaves changes the level of detail in the perlin noise function

@@ -45,5 +45,11 @@ private:
 	void GenerateGrid(unsigned int rows, unsigned int cols);
 	void SetupTerrainShader();
 	void DrawTerrain();
+
+	unsigned int m_grassTexture;
+	unsigned int m_sandTexture;
+	unsigned int m_snowTexture;
+
+	void LoadTextures();
 	
 };

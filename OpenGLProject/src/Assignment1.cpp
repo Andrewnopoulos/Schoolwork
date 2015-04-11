@@ -1,4 +1,5 @@
 #include "Assignment1.h"
+#include <stb_image.h>
 
 void Assignment1::Startup()
 {
@@ -9,12 +10,14 @@ void Assignment1::Startup()
 	m_camera->SetInputWindow(window);
 
 	m_camera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.0f, 0.1f, 1000.0f);
-	m_camera->setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
+	m_camera->setLookAt(vec3(10, 30, 10), vec3(100, 0, 100), vec3(0, 1, 0));
 
-	m_camera->setSpeed(10);
+	m_camera->setSpeed(100);
 	m_camera->setRotationSpeed(10);
 
 	previousTime = (float)glfwGetTime();
+
+	LoadTextures();
 
 	SetupScene();
 }
@@ -43,8 +46,29 @@ void Assignment1::DrawTerrain()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_terrainTextureMap);
 
-	unsigned int texloc = glGetUniformLocation(m_terrainShader, "perlin_texture");
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_sandTexture);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, m_grassTexture);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, m_snowTexture);
+
+	unsigned int texloc = glGetUniformLocation(m_terrainShader, "heightMap");
 	glUniform1i(texloc, 0);
+
+	texloc = glGetUniformLocation(m_terrainShader, "sandTexture");
+	glUniform1i(texloc, 1);
+
+	texloc = glGetUniformLocation(m_terrainShader, "grassTexture");
+	glUniform1i(texloc, 2);
+
+	texloc = glGetUniformLocation(m_terrainShader, "snowTexture");
+	glUniform1i(texloc, 3);
+
+	texloc = glGetUniformLocation(m_terrainShader, "maxHeight");
+	glUniform1f(texloc, m_terrainGen->GetMaxHeight());
 
 	glBindVertexArray(m_ter_VAO);
 
@@ -52,6 +76,49 @@ void Assignment1::DrawTerrain()
 
 	glDrawElements(GL_TRIANGLES, m_terrainIndeces, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+}
+
+void Assignment1::LoadTextures()
+{
+	int imageWidth = 0, imageHeight = 0, imageFormat = 0;
+	unsigned char* data;
+
+
+	data = stbi_load("../data/textures/grass.jpg",
+		&imageWidth, &imageHeight, &imageFormat, STBI_default);
+
+	glGenTextures(1, &m_grassTexture);
+	glBindTexture(GL_TEXTURE_2D, m_grassTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight,
+		0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(data);
+
+
+	data = stbi_load("../data/textures/dirt.jpg",
+		&imageWidth, &imageHeight, &imageFormat, STBI_default);
+
+	glGenTextures(1, &m_sandTexture);
+	glBindTexture(GL_TEXTURE_2D, m_sandTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight,
+		0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(data);
+
+
+	data = stbi_load("../data/textures/snow.jpg",
+		&imageWidth, &imageHeight, &imageFormat, STBI_default);
+
+	glGenTextures(1, &m_snowTexture);
+	glBindTexture(GL_TEXTURE_2D, m_snowTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight,
+		0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(data);
+
 }
 
 void Assignment1::Destroy()
@@ -65,7 +132,7 @@ void Assignment1::SetupScene()
 	int dimensions = 257;
 
 	// get max height of terrain
-	m_terrainGen->SetMaxHeight(5.0f);
+	m_terrainGen->SetMaxHeight(4.0f);
 
 	SetupTerrainShader();
 	GenerateTerrain(dimensions, 1);
