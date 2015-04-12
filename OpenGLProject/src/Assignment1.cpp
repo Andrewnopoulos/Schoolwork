@@ -13,8 +13,8 @@ void Assignment1::Startup()
 	m_camera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.0f, 0.1f, 1000.0f);
 	m_camera->setLookAt(vec3(10, 30, 10), vec3(100, 0, 100), vec3(0, 1, 0));
 
-	m_camera->setSpeed(100);
-	m_camera->setRotationSpeed(10);
+	m_camera->setSpeed(10);
+	m_camera->setRotationSpeed(7);
 
 	previousTime = (float)glfwGetTime();
 
