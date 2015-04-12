@@ -21,6 +21,10 @@ void Assignment1::Startup()
 	LoadTextures();
 
 	SetupScene();
+
+	testMat = mat4(1);
+	testMat = glm::scale(testMat, vec3(0.1f, 0.1f, 0.1f));
+	testMat = glm::rotate(testMat, glm::pi<float>() / 2.0f, vec3(-1, 0, 0));
 }
 
 void Assignment1::Update()
@@ -30,6 +34,13 @@ void Assignment1::Update()
 	previousTime = currentTime;
 
 	m_camera->update(deltaTime);
+
+	//testMat = glm::translate(testMat, vec3(0, deltaTime, 0));
+
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		SetupScene();
+	}
 }
 
 void Assignment1::Draw()
@@ -39,6 +50,8 @@ void Assignment1::Draw()
 	DrawSkybox();
 
 	DrawTerrain();
+
+	testTree->Render(m_camera, vec3(0, 1, 0), testMat);
 }
 
 void Assignment1::DrawTerrain()
@@ -144,6 +157,7 @@ void Assignment1::SetupScene()
 	SetupSkyboxShader();
 	LoadSkybox();
 
+	SetupTrees();
 }
 
 void Assignment1::DrawSkybox()
@@ -184,6 +198,15 @@ void Assignment1::SetupTerrainShader()
 		"Terrain", 
 		"../data/shaders/a1Terrain.vert", 
 		"../data/shaders/a1Terrain.frag");
+}
+
+void Assignment1::SetupTrees()
+{
+	testTree = new FBXObject("../data/trees/treeplan1.fbx");
+	testTree->SetupShader(m_shaderManager, "../data/shaders/tree.vert", 
+		"../data/shaders/tree.frag");
+	testTree->LoadDiffuse("../data/trees/ConiferBark.tga");
+	testTree->LoadNormals("../data/trees/ConiferBark_Normal.tga");
 }
 
 void Assignment1::LoadSkybox()

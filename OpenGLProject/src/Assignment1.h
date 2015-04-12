@@ -4,6 +4,7 @@
 #include "FlyCamera.h"
 #include "TerrainGenerator.h"
 #include "ShaderManager.h"
+#include "FBXObject.h"
 
 
 using glm::vec2;
@@ -55,6 +56,7 @@ private:
 
 	void LoadTextures();
 
+	//Skybox stuff
 	void SetupSkyboxShader();
 	void LoadSkybox();
 	void DrawSkybox();
@@ -63,5 +65,12 @@ private:
 	unsigned int m_skyboxTexture;
 
 	unsigned int m_skyboxVAO, m_skyboxVBO;
+
+
+	FBXObject* testTree;
+
+	void SetupTrees();
+
+	mat4 testMat;
 
 };

@@ -99,6 +99,9 @@
     <ClCompile Include="..\src\TerrainGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\FBXObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gl_core_4_4.h">
@@ -174,6 +177,9 @@
       <Filter>Header Files\Tutorials</Filter>
     </ClInclude>
     <ClInclude Include="..\src\TerrainGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FBXObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

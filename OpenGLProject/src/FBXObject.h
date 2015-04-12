@@ -1,6 +1,10 @@
 #pragma once
 
 #include <FBXFile.h>
+#include "gl_core_4_4.h"
+
+class ShaderManager;
+class FlyCamera;
 
 using glm::vec3;
 using glm::vec4;
@@ -15,12 +19,17 @@ private:
 	void createOpenGLBuffers();
 	void cleanupOpenGLBuffers();
 
+	bool hasNormalsMap;
+	bool hasDiffuseMap;
+
 public:
 
-	void LoadVerts(char* filePath);
+	FBXObject(char* filePath);
+	~FBXObject();
+
 	void LoadDiffuse(char* filePath);
 	void LoadNormals(char* filePath);
 
-	void SetupShader(char* fragpath, char* vertpath);
-	void Render(mat4 LocalMatrix);
+	void SetupShader(ShaderManager* sMan, char* vertPath, char* fragPath);
+	void Render(FlyCamera* camera, vec3 LightDir, mat4 LocalMatrix);
 };
