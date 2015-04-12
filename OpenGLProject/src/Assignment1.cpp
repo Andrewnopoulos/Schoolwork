@@ -234,12 +234,12 @@ void Assignment1::LoadSkybox()
 	};
 
 	std::vector<char*> faces;
-	faces.push_back("../data/textures/skybox/right.tga");
-	faces.push_back("../data/textures/skybox/left.tga");
-	faces.push_back("../data/textures/skybox/top.tga");
-	faces.push_back("../data/textures/skybox/bottom.tga");
-	faces.push_back("../data/textures/skybox/back.tga");
-	faces.push_back("../data/textures/skybox/front.tga");
+	faces.push_back("../data/textures/skybox/right.bmp");
+	faces.push_back("../data/textures/skybox/left.bmp");
+	faces.push_back("../data/textures/skybox/top.bmp");
+	faces.push_back("../data/textures/skybox/bottom.bmp");
+	faces.push_back("../data/textures/skybox/back.bmp");
+	faces.push_back("../data/textures/skybox/front.bmp");
 
 	glGenVertexArrays(1, &m_skyboxVAO);
 	glGenBuffers(1, &m_skyboxVBO);
