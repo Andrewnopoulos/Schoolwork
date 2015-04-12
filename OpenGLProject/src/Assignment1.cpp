@@ -22,9 +22,10 @@ void Assignment1::Startup()
 
 	SetupScene();
 
-	testMat = mat4(1);
+	testMat = glm::translate(vec3(0, 50, 0));
 	testMat = glm::scale(testMat, vec3(0.1f, 0.1f, 0.1f));
 	testMat = glm::rotate(testMat, glm::pi<float>() / 2.0f, vec3(-1, 0, 0));
+
 }
 
 void Assignment1::Update()
