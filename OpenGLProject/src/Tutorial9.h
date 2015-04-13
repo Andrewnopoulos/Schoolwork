@@ -4,6 +4,8 @@
 #include "FlyCamera.h"
 #include "GPUParticleEmitter.h"
 
+#include "SnowEmitter.h"
+
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
@@ -21,7 +23,9 @@ private:
 	float currentTime;
 	FlyCamera myCam;
 
-	GPUParticleEmitter* m_emitter;
+	//GPUParticleEmitter* m_emitter;
+
+	SnowEmitter* m_emitter;
 
 	unsigned int m_programID;
 

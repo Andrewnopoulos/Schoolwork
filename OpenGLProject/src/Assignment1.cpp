@@ -29,9 +29,9 @@ void Assignment1::Startup()
 	m_snowEmitter = new SnowEmitter();
 
 	m_snowEmitter->initialise(10000,
-		0.1f, 5.0f,
+		10.0f, 20.0f,
 		5, 20,
-		50, 0.0f,
+		500, 0.0f,
 		vec4(1, 0, 0, 1), vec4(1, 1, 0, 1));
 
 }
@@ -62,7 +62,7 @@ void Assignment1::Draw()
 
 	testTree->Render(m_camera, vec3(0, 1, 0), testMat);
 
-	m_snowEmitter->draw((float)glfwGetTime(),
+	m_snowEmitter->draw(previousTime,
 		m_camera->getWorldTransform(),
 		m_camera->getProjectionView());
 }

@@ -104,11 +104,11 @@ void SnowEmitter::createBuffers() {
 void SnowEmitter::createDrawShader()
 {
 	unsigned int vs = loadShader(GL_VERTEX_SHADER,
-		"../data/shaders/SnowParticle.vert");
+		"../data/shaders/gpuParticle.vert");
 	unsigned int gs = loadShader(GL_GEOMETRY_SHADER,
-		"../data/shaders/SnowParticle.geom");
+		"../data/shaders/gpuParticle.geom");
 	unsigned int fs = loadShader(GL_FRAGMENT_SHADER,
-		"../data/shaders/SnowParticle.frag");
+		"../data/shaders/gpuParticle.frag");
 
 	m_drawShader = glCreateProgram();
 	glAttachShader(m_drawShader, vs);
@@ -143,7 +143,7 @@ void SnowEmitter::createUpdateShader()
 {
 	// create a shader
 	unsigned int vs = loadShader(GL_VERTEX_SHADER,
-		"../data/shaders/SnowParticleUpdate.vert");
+		"../data/shaders/gpuParticleUpdate.vert");
 	m_updateShader = glCreateProgram();
 	glAttachShader(m_updateShader, vs);
 
