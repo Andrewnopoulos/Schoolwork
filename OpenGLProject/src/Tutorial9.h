@@ -23,9 +23,9 @@ private:
 	float currentTime;
 	FlyCamera myCam;
 
-	//GPUParticleEmitter* m_emitter;
+	GPUParticleEmitter* m_emitter;
 
-	SnowEmitter* m_emitter;
+	//SnowEmitter* m_emitter;
 
 	unsigned int m_programID;
 

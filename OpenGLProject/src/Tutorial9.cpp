@@ -10,8 +10,8 @@ void Tutorial9::Startup()
 	myCam.setSpeed(20);
 	myCam.setRotationSpeed(0.1f);
 
-	//m_emitter = new GPUParticleEmitter();
-	m_emitter = new SnowEmitter();
+	m_emitter = new GPUParticleEmitter();
+	//m_emitter = new SnowEmitter();
 	
 	m_emitter->initialise(100000,
 		0.1f, 5.0f,

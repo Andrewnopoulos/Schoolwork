@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <glm\glm.hpp>
 
 class TerrainGenerator
 {
@@ -13,6 +14,11 @@ public:
 	inline float GetMaxHeight()
 	{
 		return heightMax;
+	}
+
+	inline glm::vec3 GetHighestPoint()
+	{
+		return maxLocation;
 	}
 
 	/*
@@ -30,6 +36,7 @@ public:
 	float* GenerateDiamondSquare(const int dimensions, const float roughness, const bool smoothing);
 private:
 
+	glm::vec3 maxLocation;
 	float heightMax;
 	// returns a random float located between low and high.
 	const float RandomNumber(const float low, const float high)
@@ -38,4 +45,5 @@ private:
 	}
 
 	void Normalize(float * value, unsigned int size);
+
 };

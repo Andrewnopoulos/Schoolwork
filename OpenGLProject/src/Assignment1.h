@@ -44,15 +44,29 @@ private:
 	unsigned int m_terrainTextureMap;
 	unsigned int m_terrainShader;
 
+	unsigned int m_waterIndices;
+	unsigned int m_water_VAO;
+	unsigned int m_water_VBO;
+	unsigned int m_water_IBO;
+
+	unsigned int m_waterShader;
+
+	unsigned int m_waterTexture;
+
+	void GenerateWaterVerts(unsigned int rows, unsigned int cols);
+	void SetupWaterShader();
+	void DrawWater();
+
 	void SetupScene();
 	void GenerateTerrain(unsigned int dimensions, int method);
-	void GenerateGrid(unsigned int rows, unsigned int cols);
+	void GenerateTerrainVerts(unsigned int rows, unsigned int cols);
 	void SetupTerrainShader();
 	void DrawTerrain();
 
 	unsigned int m_grassTexture;
-	unsigned int m_sandTexture;
+	unsigned int m_dirtTexture;
 	unsigned int m_snowTexture;
+	unsigned int m_sandTexture;
 
 	void LoadTextures();
 
@@ -66,13 +80,13 @@ private:
 
 	unsigned int m_skyboxVAO, m_skyboxVBO;
 
-
 	FBXObject* testTree;
 
 	void SetupTrees();
 
 	mat4 testMat;
 
+	void SetupSnow();
 	SnowEmitter* m_snowEmitter;
 
 };

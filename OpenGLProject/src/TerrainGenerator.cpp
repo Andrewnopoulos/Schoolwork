@@ -1,5 +1,4 @@
 #include "TerrainGenerator.h"
-#include <glm\glm.hpp>
 #include "glm\gtc\noise.hpp"
 #include <string>
 #include <list>
@@ -15,30 +14,58 @@ void TerrainGenerator::SetMaxHeight(float a_heightMax)
 	heightMax = a_heightMax;
 }
 
-void TerrainGenerator::Normalize(float * data, unsigned int size)
+void TerrainGenerator::Normalize(float * data, unsigned int dimension)
 {
 	float maxVal = 0;
 	float minVal = 0;
 	// find largest and smallest values
-	for (int i = 0; i < size; i++)
+	//for (int i = 0; i < size; i++)
+	//{
+	//	if (data[i] > maxVal)
+	//	{
+	//		maxVal = data[i];
+	//	}
+	//	if (data[i] < minVal)
+	//	{
+	//		minVal = data[i];
+	//	}
+	//}
+
+	for (unsigned int x = 0; x < dimension; x++)
 	{
-		if (data[i] > maxVal)
+		for (unsigned int y = 0; y < dimension; y++)
 		{
-			maxVal = data[i];
-		}
-		if (data[i] < minVal)
-		{
-			minVal = data[i];
+			if (data[y*dimension + x] > maxVal)
+			{
+				maxVal = data[y*dimension + x];
+				maxLocation = glm::vec3(x, heightMax, y);
+			}
+			if (data[y*dimension + x] < minVal)
+			{
+				minVal = data[y*dimension + x];
+			}
 		}
 	}
+
+
 	float totalHighest = abs(maxVal) + abs(minVal);
 	minVal = abs(minVal);
 	// normalize and multiply by height max
-	for (int i = 0; i < size; i++)
+	//for (int i = 0; i < size; i++)
+	//{
+	//	data[i] += minVal;
+	//	data[i] /= totalHighest;
+	//	data[i] *= heightMax;
+	//}
+
+	for (unsigned int x = 0; x < dimension; x++)
 	{
-		data[i] += minVal;
-		data[i] /= totalHighest;
-		data[i] *= heightMax;
+		for (unsigned int y = 0; y < dimension; y++)
+		{
+			data[y*dimension + x] += minVal;
+			data[y*dimension + x] /= totalHighest;
+			data[y*dimension + x] *= heightMax;
+		}
 	}
 }
 
@@ -65,7 +92,7 @@ float* TerrainGenerator::GeneratePerlin(const int dimension, const int octaves)
 		}
 	}
 
-	Normalize(perlin_data, dimension * dimension);
+	Normalize(perlin_data, dimension);
 
 	return perlin_data;
 }
@@ -257,7 +284,7 @@ float* TerrainGenerator::GenerateDiamondSquare(const int dimension, const float 
 		}
 	}
 
-	Normalize(diamond_square_data, dimension * dimension);
+	Normalize(diamond_square_data, dimension);
 
 	if (smoothing)
 	{

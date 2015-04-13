@@ -14,7 +14,7 @@ struct SnowParticle
 class SnowEmitter 
 {
 public:
-	SnowEmitter();
+	SnowEmitter(glm::vec3 a_position);
 	virtual ~SnowEmitter();
 
 	void initialise(unsigned int a_maxParticles,

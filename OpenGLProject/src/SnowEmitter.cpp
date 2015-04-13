@@ -2,9 +2,8 @@
 #include "gl_core_4_4.h"
 #include <stdio.h>
 
-SnowEmitter::SnowEmitter()
+SnowEmitter::SnowEmitter(glm::vec3 a_position)
 	: m_particles(nullptr), m_maxParticles(0),
-	m_position(0, 0, 0),
 	m_drawShader(0),
 	m_updateShader(0),
 	m_lastDrawTime(0) {
@@ -12,6 +11,7 @@ SnowEmitter::SnowEmitter()
 	m_vao[1] = 0;
 	m_vbo[0] = 0;
 	m_vbo[1] = 0;
+	m_position = a_position;
 }
 
 SnowEmitter::~SnowEmitter() {
@@ -104,11 +104,11 @@ void SnowEmitter::createBuffers() {
 void SnowEmitter::createDrawShader()
 {
 	unsigned int vs = loadShader(GL_VERTEX_SHADER,
-		"../data/shaders/gpuParticle.vert");
+		"../data/shaders/snowParticle.vert");
 	unsigned int gs = loadShader(GL_GEOMETRY_SHADER,
-		"../data/shaders/gpuParticle.geom");
+		"../data/shaders/snowParticle.geom");
 	unsigned int fs = loadShader(GL_FRAGMENT_SHADER,
-		"../data/shaders/gpuParticle.frag");
+		"../data/shaders/snowParticle.frag");
 
 	m_drawShader = glCreateProgram();
 	glAttachShader(m_drawShader, vs);
@@ -143,7 +143,7 @@ void SnowEmitter::createUpdateShader()
 {
 	// create a shader
 	unsigned int vs = loadShader(GL_VERTEX_SHADER,
-		"../data/shaders/gpuParticleUpdate.vert");
+		"../data/shaders/snowParticleUpdate.vert");
 	m_updateShader = glCreateProgram();
 	glAttachShader(m_updateShader, vs);
 
