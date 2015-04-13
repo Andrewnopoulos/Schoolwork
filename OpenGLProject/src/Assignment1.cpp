@@ -26,10 +26,12 @@ void Assignment1::Startup()
 	testMat = glm::scale(testMat, vec3(0.1f, 0.1f, 0.1f));
 	testMat = glm::rotate(testMat, glm::pi<float>() / 2.0f, vec3(-1, 0, 0));
 
-	m_snowEmitter->initialise(1000,
+	m_snowEmitter = new SnowEmitter();
+
+	m_snowEmitter->initialise(10000,
 		0.1f, 5.0f,
 		5, 20,
-		1, 0.0f,
+		50, 0.0f,
 		vec4(1, 0, 0, 1), vec4(1, 1, 0, 1));
 
 }
@@ -54,15 +56,15 @@ void Assignment1::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_snowEmitter->draw((float)glfwGetTime(),
-		m_camera->getWorldTransform(),
-		m_camera->getProjectionView());
-
 	DrawSkybox();
 
 	DrawTerrain();
 
 	testTree->Render(m_camera, vec3(0, 1, 0), testMat);
+
+	m_snowEmitter->draw((float)glfwGetTime(),
+		m_camera->getWorldTransform(),
+		m_camera->getProjectionView());
 }
 
 void Assignment1::DrawTerrain()
