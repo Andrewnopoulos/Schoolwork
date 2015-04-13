@@ -5,7 +5,7 @@
 #include "TerrainGenerator.h"
 #include "ShaderManager.h"
 #include "FBXObject.h"
-
+#include "SnowEmitter.h"
 
 using glm::vec2;
 using glm::vec3;
@@ -72,5 +72,7 @@ private:
 	void SetupTrees();
 
 	mat4 testMat;
+
+	SnowEmitter* m_snowEmitter;
 
 };

@@ -14,7 +14,7 @@ void Assignment1::Startup()
 	m_camera->setLookAt(vec3(10, 30, 10), vec3(100, 0, 100), vec3(0, 1, 0));
 
 	m_camera->setSpeed(10);
-	m_camera->setRotationSpeed(7);
+	m_camera->setRotationSpeed(1);
 
 	previousTime = (float)glfwGetTime();
 
@@ -25,6 +25,12 @@ void Assignment1::Startup()
 	testMat = glm::translate(vec3(0, 50, 0));
 	testMat = glm::scale(testMat, vec3(0.1f, 0.1f, 0.1f));
 	testMat = glm::rotate(testMat, glm::pi<float>() / 2.0f, vec3(-1, 0, 0));
+
+	m_snowEmitter->initialise(1000,
+		0.1f, 5.0f,
+		5, 20,
+		1, 0.0f,
+		vec4(1, 0, 0, 1), vec4(1, 1, 0, 1));
 
 }
 
@@ -47,6 +53,10 @@ void Assignment1::Update()
 void Assignment1::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	m_snowEmitter->draw((float)glfwGetTime(),
+		m_camera->getWorldTransform(),
+		m_camera->getProjectionView());
 
 	DrawSkybox();
 
