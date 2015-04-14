@@ -59,6 +59,8 @@ protected:
 	
 	unsigned int m_drawShader;
 	unsigned int m_updateShader;
+
+	unsigned int m_snowTexture;
 	
 	float m_lastDrawTime;
 };

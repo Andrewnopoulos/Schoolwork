@@ -100,6 +100,20 @@ void Assignment1::DrawTerrain()
 	texloc = glGetUniformLocation(m_terrainShader, "maxHeight");
 	glUniform1f(texloc, m_terrainGen->GetMaxHeight());
 
+	texloc = glGetUniformLocation(m_terrainShader, "roughness");
+	glUniform1f(texloc, 0.2f);
+
+	texloc = glGetUniformLocation(m_terrainShader, "fresnel");
+	glUniform1f(texloc, 1.0f);
+
+	mat4 camera_matrix = m_camera->getWorldTransform();
+	texloc = glGetUniformLocation(m_terrainShader, "CameraPos");
+	glUniform3f(texloc, camera_matrix[3][0],
+		camera_matrix[3][1], camera_matrix[3][2]);
+
+	texloc = glGetUniformLocation(m_terrainShader, "LightDir");
+	glUniform3f(texloc, 0, 1, 0);
+
 	glBindVertexArray(m_ter_VAO);
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // wireframe
@@ -257,7 +271,7 @@ void Assignment1::SetupSnow()
 
 	m_snowEmitter = new SnowEmitter(highestPoint);
 
-	m_snowEmitter->initialise(1000000,	// number
+	m_snowEmitter->initialise(100000,	// number
 		1.0f, 50.0f,					// min/max lifespan
 		5, 20,							// min/max velocity
 		0.1f, 0.06f,						// starting/ending size

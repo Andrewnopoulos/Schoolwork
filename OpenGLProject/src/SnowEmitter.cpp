@@ -1,6 +1,7 @@
 #include "SnowEmitter.h"
 #include "gl_core_4_4.h"
 #include <stdio.h>
+#include <stb_image.h>
 
 SnowEmitter::SnowEmitter(glm::vec3 a_position)
 	: m_particles(nullptr), m_maxParticles(0),
@@ -52,6 +53,21 @@ void SnowEmitter::initialise(unsigned int a_maxParticles,
 	createUpdateShader();
 
 	createDrawShader();
+
+	int imageWidth = 0, imageHeight = 0, imageFormat = 0;
+	unsigned char* data;
+
+
+	data = stbi_load("../data/textures/snowflake.png",
+		&imageWidth, &imageHeight, &imageFormat, STBI_default);
+
+	glGenTextures(1, &m_snowTexture);
+	glBindTexture(GL_TEXTURE_2D, m_snowTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight,
+		0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(data);
 }
 
 void SnowEmitter::createBuffers() {
@@ -212,11 +228,21 @@ void SnowEmitter::draw(float time,
 
 	glUseProgram(m_drawShader);
 
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	location = glGetUniformLocation(m_drawShader, "projectionView");
 	glUniformMatrix4fv(location, 1, false, &a_projectionView[0][0]);
 
 	location = glGetUniformLocation(m_drawShader, "cameraTransform");
 	glUniformMatrix4fv(location, 1, false, &a_cameraTransform[0][0]);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_snowTexture);
+
+	location = glGetUniformLocation(m_drawShader, "snowTexture");
+	glUniform1i(location, 0);
 
 	// draw particles in the "other" buffer
 	glBindVertexArray(m_vao[otherBuffer]);
@@ -224,6 +250,8 @@ void SnowEmitter::draw(float time,
 
 	// swap for next frame
 	m_activeBuffer = otherBuffer;
+
+	glDisable(GL_BLEND);
 
 }
 
