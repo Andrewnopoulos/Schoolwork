@@ -13,7 +13,7 @@ void Assignment1::Startup()
 	m_camera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.0f, 0.1f, 1000.0f);
 	m_camera->setLookAt(vec3(10, 30, 10), vec3(100, 0, 100), vec3(0, 1, 0));
 
-	m_camera->setSpeed(100);
+	m_camera->setSpeed(10);
 	m_camera->setRotationSpeed(10);
 
 	previousTime = (float)glfwGetTime();
@@ -21,11 +21,6 @@ void Assignment1::Startup()
 	LoadTextures();
 
 	SetupScene();
-
-	testMat = glm::translate(vec3(0, 50, 0));
-	testMat = glm::scale(testMat, vec3(0.1f, 0.1f, 0.1f));
-	testMat = glm::rotate(testMat, glm::pi<float>() / 2.0f, vec3(-1, 0, 0));
-
 }
 
 void Assignment1::Update()
@@ -35,8 +30,6 @@ void Assignment1::Update()
 	previousTime = currentTime;
 
 	m_camera->update(deltaTime);
-
-	//testMat = glm::translate(testMat, vec3(0, deltaTime, 0));
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
@@ -52,9 +45,9 @@ void Assignment1::Draw()
 
 	DrawTerrain();
 
-	testTree->Render(m_camera, vec3(0, 1, 0), testMat);
-
 	DrawWater();
+
+	DrawRocks();
 
 	m_snowEmitter->draw(previousTime,
 		m_camera->getWorldTransform(),
@@ -112,7 +105,7 @@ void Assignment1::DrawTerrain()
 		camera_matrix[3][1], camera_matrix[3][2]);
 
 	texloc = glGetUniformLocation(m_terrainShader, "LightDir");
-	glUniform3f(texloc, 0, 1, 0);
+	glUniform3f(texloc, m_LightDir.x, m_LightDir.y, m_LightDir.z);
 
 	glBindVertexArray(m_ter_VAO);
 
@@ -196,23 +189,25 @@ void Assignment1::Destroy()
 void Assignment1::SetupScene()
 {
 	// get number of dimensions from user
-	int dimensions = 257;
+	m_dimension = 257;
+
+	m_LightDir = vec3(0, 1, 0);
 
 	// get max height of terrain
 	m_terrainGen->SetMaxHeight(80.0f);
 
 	SetupTerrainShader();
-	GenerateTerrain(dimensions, 1);
+	GenerateTerrain(m_dimension, 1);
 
 	SetupSkyboxShader();
 	LoadSkybox();
 
-	SetupTrees();
+	SetupRocks();
 
 	SetupSnow();
 
 	SetupWaterShader();
-	GenerateWaterVerts(dimensions, dimensions);
+	GenerateWaterVerts(m_dimension, m_dimension);
 	
 }
 
@@ -256,13 +251,89 @@ void Assignment1::SetupTerrainShader()
 		"../data/shaders/a1Terrain.frag");
 }
 
-void Assignment1::SetupTrees()
+void Assignment1::SetupRocks()
 {
-	testTree = new FBXObject("../data/trees/treeplan1.fbx");
-	testTree->SetupShader(m_shaderManager, "../data/shaders/tree.vert", 
+	m_rock1 = new FBXObject("../data/trees/rock.fbx");
+	m_rock1->SetupShader(m_shaderManager,
+		"../data/shaders/tree.vert", 
 		"../data/shaders/tree.frag");
-	testTree->LoadDiffuse("../data/trees/ConiferBark.tga");
-	testTree->LoadNormals("../data/trees/ConiferBark_Normal.tga");
+	m_rock1->LoadDiffuse("../data/trees/rockDiffuse.tga");
+	m_rock1->LoadNormals("../data/trees/rockNormal.tga");
+
+	m_rock2 = new FBXObject("../data/trees/Rock2.fbx");
+	m_rock2->SetupShader(m_shaderManager,
+		"../data/shaders/tree.vert",
+		"../data/shaders/tree.frag");
+	m_rock2->LoadDiffuse("../data/trees/Rock2.jpg");
+
+	m_spire = new FBXObject("../data/trees/stone.fbx");
+	m_spire->SetupShader(m_shaderManager,
+		"../data/shaders/tree.vert",
+		"../data/shaders/tree.frag");
+	m_spire->LoadDiffuse("../data/trees/stone.jpg");
+
+	// set up matrices
+
+	for (unsigned int i = 0; i < 20; i++)
+	{
+		vec3 position = vec3(rand() % m_dimension, 0, rand() % m_dimension);
+		unsigned int index = position.x + m_dimension * position.z;
+		position.y = m_terrainData[index];
+		mat4 tempMat = glm::translate(position);
+		tempMat = glm::scale(tempMat, vec3(0.027f));
+		tempMat = glm::rotate(tempMat, (float)(rand() % 360), glm::normalize(vec3(rand() % 10, rand() % 10, rand() % 10)));
+		m_rock1Locations.push_back(tempMat);
+	}
+
+	for (unsigned int i = 0; i < 50; i++)
+	{
+		vec3 position = vec3(rand() % m_dimension, 0, rand() % m_dimension);
+		unsigned int index = position.x + m_dimension * position.z;
+		position.y = m_terrainData[index];
+		mat4 tempMat = glm::translate(position);
+		tempMat = glm::scale(tempMat, vec3(1.0f));
+		tempMat = glm::rotate(tempMat, (float)(rand() % 360), glm::normalize(vec3(rand() % 10, rand() % 10, rand() % 10)));
+		m_rock2Locations.push_back(tempMat);
+	}
+
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		vec3 position = vec3(rand() % m_dimension, 0, rand() % m_dimension);
+		unsigned int index = position.x + m_dimension * position.z;
+		position.y = m_terrainData[index] + 4;
+		mat4 tempMat = glm::translate(position);
+		tempMat = glm::scale(tempMat, vec3(0.05f, 0.1f, 0.05f));
+		tempMat = glm::rotate(tempMat, (float)(rand() % 360), vec3(0, 1, 0));
+	//	tempMat = glm::rotate(tempMat, (float)(rand() % 360), glm::normalize(vec3(rand() % 10, rand() % 10, rand() % 10)));
+		m_spireLocations.push_back(tempMat);
+	}
+
+	//testMat = glm::translate(vec3(0, 50, 0));
+	//testMat = glm::scale(testMat, vec3(0.05f, 0.05f, 0.05f));
+	//testMat = glm::rotate(testMat, glm::pi<float>() / 2.0f, vec3(-1, 0, 0));
+
+	//testMat2 = glm::translate(vec3(0, 25, 0));
+	//testMat2 = glm::scale(testMat2, vec3(0.05f, 0.05f, 0.05f));
+	//testMat2 = glm::rotate(testMat2, glm::pi<float>() / 2.0f, vec3(-1, 0, 0));
+}
+
+void Assignment1::DrawRocks()
+{
+
+	for (auto i = m_rock1Locations.begin(); i != m_rock1Locations.end(); i++)
+	{
+		m_rock1->Render(m_camera, m_LightDir, (*i));
+	}
+
+	for (auto i = m_rock2Locations.begin(); i != m_rock2Locations.end(); i++)
+	{
+		m_rock2->Render(m_camera, m_LightDir, (*i));
+	}
+
+	for (auto i = m_spireLocations.begin(); i != m_spireLocations.end(); i++)
+	{
+		m_spire->Render(m_camera, m_LightDir, (*i));
+	}
 }
 
 void Assignment1::SetupSnow()

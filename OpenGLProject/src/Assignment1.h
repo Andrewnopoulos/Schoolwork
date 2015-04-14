@@ -6,11 +6,13 @@
 #include "ShaderManager.h"
 #include "FBXObject.h"
 #include "SnowEmitter.h"
+#include <vector>
 
 using glm::vec2;
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
+using std::vector;
 
 struct terrainVert
 {
@@ -34,6 +36,9 @@ private:
 	
 	float previousTime;
 	float deltaTime;
+
+	unsigned int m_dimension;
+	vec3 m_LightDir;
 
 	unsigned int m_terrainIndeces;
 	unsigned int m_ter_VAO;
@@ -80,11 +85,16 @@ private:
 
 	unsigned int m_skyboxVAO, m_skyboxVBO;
 
-	FBXObject* testTree;
+	FBXObject* m_rock1;
+	FBXObject* m_rock2;
+	FBXObject* m_spire;
 
-	void SetupTrees();
+	vector<mat4> m_rock1Locations;
+	vector<mat4> m_rock2Locations;
+	vector<mat4> m_spireLocations;
 
-	mat4 testMat;
+	void SetupRocks();
+	void DrawRocks();
 
 	void SetupSnow();
 	SnowEmitter* m_snowEmitter;

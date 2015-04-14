@@ -8,7 +8,7 @@
 FBXObject::FBXObject(char* filePath)
 {
 	m_fbx = new FBXFile();
-	m_fbx->load(filePath);
+	m_fbx->load(filePath, FBXFile::UNITS_CENTIMETER, false, false);
 	createOpenGLBuffers();
 	hasDiffuseMap = false;
 	hasNormalsMap = false;
@@ -90,7 +90,7 @@ FBXObject::~FBXObject()
 	glDeleteProgram(m_programID);
 }
 
-void FBXObject::SetupShader(ShaderManager* sMan, char* vertPath, char* fragPath)
+void FBXObject::SetupShader(ShaderManager* sMan,  char* vertPath, char* fragPath)
 {
 	m_programID = sMan->LoadShader("program", vertPath, fragPath);
 }
@@ -148,8 +148,12 @@ void FBXObject::Render(FlyCamera* camera, vec3 LightDir, mat4 LocalMatrix)
 	loc = glGetUniformLocation(m_programID, "Local");
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(LocalMatrix));
 
+	vec4 Light = vec4(LightDir, 1) * LocalMatrix;
+
+	vec3 Lightout = glm::normalize(vec3(Light.x, Light.y, Light.z));
+
 	loc = glGetUniformLocation(m_programID, "LightDir");
-	glUniform3f(loc, LightDir.x, LightDir.y, LightDir.z);
+	glUniform3f(loc, Lightout.x, Lightout.y, Lightout.z);
 
 	mat4 camera_matrix = camera->getWorldTransform();
 	loc = glGetUniformLocation(m_programID, "CameraPos");

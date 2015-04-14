@@ -23,38 +23,6 @@ uniform float shadowBias;
 uniform float roughness;
 uniform float fresnel;
 
-vec4 oldSchool()
-{
-	mat3 TBN = mat3(
-		normalize( vTangent ),
-		normalize( vBiTangent ),
-		normalize( vNormal ));
-		
-	vec3 N = texture( normal,
-		vTexCoord).xyz * 2 - 1;
-	
-	float d = max(0, dot( normalize(TBN * N), normalize(LightDir) ) );
-	vec3 E = normalize( CameraPos - vPosition );
-	vec3 R = reflect( -LightDir, vNormal );
-	
-	float s = max( 0, dot( E, R ) );
-	s = pow( s, SpecPow );
-	
-	float shad = max(0, dot(normalize(vNormal.xyz), LightDir));
-	if (texture(shadowMap, vShadowCoord.xy).r < vShadowCoord.z - shadowBias) 
-	{
-		shad = 0;
-	}
-	
-	vec4 outcolour = texture(diffuse, vTexCoord);
-	//vec4 outcolour = vec4(0, 1, 0 1)
-	
-	outcolour.rgb = outcolour.rgb * d + s * 0.1; 
-	
-	outcolour = outcolour * shad;
-	return outcolour;
-}
-
 vec4 realistic()
 {
 	vec3 L = LightDir;
@@ -102,16 +70,16 @@ vec4 realistic()
 	// Calculate Cook-Torrance
 	float CookTorrance = max( (D*G*F) / (NdE * pi), 0.0f );
 	
-	float shad = max(0, dot(normalize(vNormal.xyz), LightDir));
-	if (texture(shadowMap, vShadowCoord.xy).r < vShadowCoord.z - shadowBias) {
-		shad = 0;
-	}
+//	float shad = max(0, dot(normalize(vNormal.xyz), LightDir));
+//	if (texture(shadowMap, vShadowCoord.xy).r < vShadowCoord.z - shadowBias) {
+//		shad = 0;
+//	}
 	
 	vec4 outcolour = texture(diffuse, vTexCoord);
 	//vec4 outcolour = vec4(0, 1, 0, 1);
 	
 	outcolour.rgb = outcolour.rgb * (OrenNayar + CookTorrance);
-	outcolour = outcolour * shad;
+//	outcolour = outcolour * shad;
 	return outcolour;
 	
 }
