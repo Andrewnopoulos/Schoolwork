@@ -12,7 +12,7 @@ void Tutorial13::Startup()
 	myCam.setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
 
 	myCam.setSpeed(10);
-	myCam.setRotationSpeed(10.0f);
+	myCam.setRotationSpeed(1.0f);
 
 	m_fbx = new FBXFile();
 	m_fbx->load("../data/soulspear/soulspear.fbx");

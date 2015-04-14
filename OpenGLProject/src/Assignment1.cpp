@@ -274,6 +274,10 @@ void Assignment1::SetupRocks()
 
 	// set up matrices
 
+	m_rock1Locations.clear();
+	m_rock2Locations.clear();
+	m_spireLocations.clear();
+
 	for (unsigned int i = 0; i < 20; i++)
 	{
 		vec3 position = vec3(rand() % m_dimension, 0, rand() % m_dimension);
