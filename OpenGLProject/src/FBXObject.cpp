@@ -173,7 +173,11 @@ void FBXObject::Render(FlyCamera* camera, vec3 LightDir, mat4 LocalMatrix)
 		loc = glGetUniformLocation(m_programID, "normalMap");
 		glUniform1i(loc, 1);
 	}
+	int roughness = glGetUniformLocation(m_programID, "roughness");
+	glUniform1f(roughness, 0.2f);
 
+	int fresnel = glGetUniformLocation(m_programID, "fresnel");
+	glUniform1f(fresnel, 1.0f);
 	// bind our vertex array object and draw the mesh
 	for (unsigned int i = 0; i < m_fbx->getMeshCount(); ++i) {
 		FBXMeshNode* mesh = m_fbx->getMeshByIndex(i);
