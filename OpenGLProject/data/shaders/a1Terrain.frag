@@ -14,6 +14,8 @@ uniform sampler2D dirtTexture;
 
 uniform float maxHeight;
 
+uniform float waterLevel;
+
 uniform float roughness;
 uniform float fresnel;
 
@@ -97,12 +99,16 @@ void main() {
 	
 	float fscale = vPos.y / (maxHeight);
 	
-	const float range0 = 0.14f;
-	const float range1 = 0.2f;
-	const float range2 = 0.4f;
-	const float range3 = 0.5f;
-	const float range4 = 0.65f;
-	const float range5 = 0.75f;
+	float wscale = waterLevel / maxHeight;
+	
+	fscale = fscale - wscale;
+	
+	float range0 = 0;
+	float range1 = 0.1;
+	float range2 = 0.4;
+	float range3 = 0.5;
+	float range4 = 0.65;
+	float range5 = 0.75;
 	
 	const float cliffBound = 0.8;
 	

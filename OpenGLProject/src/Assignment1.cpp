@@ -174,6 +174,9 @@ void Assignment1::DrawTerrain()
 	texloc = glGetUniformLocation(m_terrainShader, "LightDir");
 	glUniform3f(texloc, m_LightDir.x, m_LightDir.y, m_LightDir.z);
 
+	texloc = glGetUniformLocation(m_terrainShader, "waterLevel");
+	glUniform1f(texloc, m_waterHeight);
+
 	glBindVertexArray(m_ter_VAO);
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // wireframe
