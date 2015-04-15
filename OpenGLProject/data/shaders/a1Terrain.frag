@@ -107,8 +107,8 @@ void main() {
 	float range1 = 0.1;
 	float range2 = 0.4;
 	float range3 = 0.5;
-	float range4 = 0.65;
-	float range5 = 0.75;
+	float range4 = 0.55;
+	float range5 = 0.65;
 	
 	const float cliffBound = 0.8;
 	
