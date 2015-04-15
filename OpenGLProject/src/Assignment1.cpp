@@ -17,6 +17,7 @@ void Assignment1::Startup()
 	m_generatorRoughness = 0.3f;
 	m_perlinOctaves = 6;
 	m_waterHeight = 10.0f;
+	m_seed = 0;
 
 	m_terrainGen = new TerrainGenerator(m_maxHeight);
 
@@ -112,6 +113,7 @@ void Assignment1::SetupAntTweakBar()
 	TwAddVarRW(m_gui, "Perlin Octaves", TW_TYPE_UINT16, &m_perlinOctaves, "group=terrain");
 	TwAddVarRW(m_gui, "Gaussian smoothing", TW_TYPE_BOOLCPP, &m_gaussianSmoothing, "group=terrain");
 	TwAddVarRW(m_gui, "Water Height", TW_TYPE_FLOAT, &m_waterHeight, "group=terrain");
+	TwAddVarRW(m_gui, "Random Seed", TW_TYPE_UINT16, &m_seed, "group=terrain");
 
 	glfwSetMouseButtonCallback(window, OnMouseButton);
 	glfwSetCursorPosCallback(window, OnMousePosition);
@@ -286,6 +288,8 @@ void Assignment1::LoadAssets()
 
 void Assignment1::SetupScene()
 {
+
+	srand(m_seed);
 	// get number of dimensions from user
 
 	// get max height of terrain

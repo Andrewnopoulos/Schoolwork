@@ -58,7 +58,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\andrew.giannopoulos\Desktop\schoolwork\OpenGLProject\dep\AntTweakBar\lib;$(SolutionDir)dep\FBXLoader;$(SolutionDir)dep\glfw-3.1.bin.WIN32\lib-vc2012;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)dep\FBXLoader;$(SolutionDir)dep\glfw-3.1.bin.WIN32\lib-vc2012;$(SolutionDir)dep\AntTweakBar\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;FBXLoader_d.lib;AntTweakBar.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

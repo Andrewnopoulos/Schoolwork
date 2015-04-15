@@ -50,6 +50,7 @@ private:
 	unsigned int m_perlinOctaves;
 	bool m_gaussianSmoothing;
 	bool m_diamondSquareOn;
+	unsigned int m_seed;
 
 	unsigned int m_dimension;
 	vec3 m_LightDir;
