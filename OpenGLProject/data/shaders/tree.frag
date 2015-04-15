@@ -78,7 +78,11 @@ vec4 realistic()
 	vec4 outcolour = texture(diffuse, vTexCoord);
 	//vec4 outcolour = vec4(0, 1, 0, 1);
 	
-	outcolour.rgb = outcolour.rgb * (OrenNayar + CookTorrance);
+	float Brightness = OrenNayar + CookTorrance;
+	
+	Brightness = max(0.2, Brightness);
+	
+	outcolour.rgb = outcolour.rgb * Brightness;
 //	outcolour = outcolour * shad;
 	return outcolour;
 	

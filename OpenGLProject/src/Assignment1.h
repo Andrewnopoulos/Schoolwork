@@ -40,6 +40,17 @@ private:
 	float previousTime;
 	float deltaTime;
 
+	float m_cameraSpeed;
+	float m_cameraRotation;
+
+	float m_maxHeight;
+	float m_terrainRoughness;
+	float m_generatorRoughness;
+	float m_waterHeight;
+	unsigned int m_perlinOctaves;
+	bool m_gaussianSmoothing;
+	bool m_diamondSquareOn;
+
 	unsigned int m_dimension;
 	vec3 m_LightDir;
 
@@ -70,7 +81,7 @@ private:
 	void DrawWater();
 
 	void SetupScene();
-	void GenerateTerrain(unsigned int dimensions, int method);
+	void GenerateTerrain(unsigned int dimensions, bool method);
 	void GenerateTerrainVerts(unsigned int rows, unsigned int cols);
 	void SetupTerrainShader();
 	void DrawTerrain();

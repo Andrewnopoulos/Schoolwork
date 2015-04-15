@@ -75,7 +75,11 @@ vec4 realistic(vec4 diffuseColour)
 	
 	vec4 outColour = diffuseColour;
 	
-	outColour.rgb = outColour.rgb * (OrenNayar + CookTorrance);
+	float Brightness = OrenNayar + CookTorrance;
+	
+	Brightness = max(0.2, Brightness);
+	
+	outColour.rgb = outColour.rgb * Brightness;
 //	outColour = outColour * shad;
 	return outColour;
 	
@@ -93,8 +97,8 @@ void main() {
 	
 	float fscale = vPos.y / (maxHeight);
 	
-	const float range0 = 0.12f;
-	const float range1 = 0.16f;
+	const float range0 = 0.14f;
+	const float range1 = 0.2f;
 	const float range2 = 0.4f;
 	const float range3 = 0.5f;
 	const float range4 = 0.65f;

@@ -6,7 +6,19 @@
 
 void Assignment1::Startup()
 {
-	m_terrainGen = new TerrainGenerator(5.0f);
+	m_dimension = 257;
+	m_LightDir = vec3(0, 1, 0);
+	m_cameraSpeed = 10;
+	m_cameraRotation = 0.1f;
+	m_gaussianSmoothing = true;
+	m_diamondSquareOn = true;
+	m_maxHeight = 100.0f;
+	m_terrainRoughness = 0.2f;
+	m_generatorRoughness = 0.3f;
+	m_perlinOctaves = 6;
+	m_waterHeight = 10.0f;
+
+	m_terrainGen = new TerrainGenerator(m_maxHeight);
 
 	m_camera = new FlyCamera();
 
@@ -15,16 +27,12 @@ void Assignment1::Startup()
 	m_camera->setPerspective(glm::pi<float>() * 0.25f, 16 / 9.0f, 0.1f, 1000.0f);
 	m_camera->setLookAt(vec3(10, 30, 10), vec3(100, 0, 100), vec3(0, 1, 0));
 
-	m_camera->setSpeed(10);
-	m_camera->setRotationSpeed(0.1f);
+	m_camera->setSpeed(m_cameraSpeed);
+	m_camera->setRotationSpeed(m_cameraRotation);
 
 	previousTime = (float)glfwGetTime();
 
 	LoadAssets();
-
-	m_dimension = 257;
-
-	m_LightDir = vec3(0, 1, 0);
 
 	SetupScene();
 
@@ -33,6 +41,9 @@ void Assignment1::Startup()
 
 void Assignment1::Update()
 {
+	m_camera->setSpeed(m_cameraSpeed);
+	m_camera->setRotationSpeed(m_cameraRotation);
+
 	float currentTime = (float)glfwGetTime();
 	deltaTime = currentTime - previousTime;
 	previousTime = currentTime;
@@ -91,7 +102,16 @@ void Assignment1::SetupAntTweakBar()
 
 	m_gui = TwNewBar("Interface");
 
-	TwAddVarRW(m_gui, "Light Direction", TW_TYPE_DIR3F, &m_LightDir, "group=light");
+	TwAddVarRW(m_gui, "Light Direction", TW_TYPE_DIR3F, &m_LightDir, "group=camera");
+	TwAddVarRW(m_gui, "Max Height", TW_TYPE_FLOAT, &m_maxHeight, "group=terrain");
+	TwAddVarRW(m_gui, "Diamond Square", TW_TYPE_BOOLCPP, &m_diamondSquareOn, "group=terrain");
+	TwAddVarRW(m_gui, "Texture roughness", TW_TYPE_FLOAT, &m_terrainRoughness, "group=terrain");
+	TwAddVarRW(m_gui, "Generator roughness", TW_TYPE_FLOAT, &m_generatorRoughness, "group=terrain");
+	TwAddVarRW(m_gui, "Camera Speed", TW_TYPE_FLOAT, &m_cameraSpeed, "group=camera");
+	TwAddVarRW(m_gui, "Camera Rotation", TW_TYPE_FLOAT, &m_cameraRotation, "group=camera");
+	TwAddVarRW(m_gui, "Perlin Octaves", TW_TYPE_UINT16, &m_perlinOctaves, "group=terrain");
+	TwAddVarRW(m_gui, "Gaussian smoothing", TW_TYPE_BOOLCPP, &m_gaussianSmoothing, "group=terrain");
+	TwAddVarRW(m_gui, "Water Height", TW_TYPE_FLOAT, &m_waterHeight, "group=terrain");
 
 	glfwSetMouseButtonCallback(window, OnMouseButton);
 	glfwSetCursorPosCallback(window, OnMousePosition);
@@ -141,7 +161,7 @@ void Assignment1::DrawTerrain()
 	glUniform1f(texloc, m_terrainGen->GetMaxHeight());
 
 	texloc = glGetUniformLocation(m_terrainShader, "roughness");
-	glUniform1f(texloc, 0.2f);
+	glUniform1f(texloc, m_terrainRoughness);
 
 	texloc = glGetUniformLocation(m_terrainShader, "fresnel");
 	glUniform1f(texloc, 1.0f);
@@ -266,10 +286,10 @@ void Assignment1::SetupScene()
 	// get number of dimensions from user
 
 	// get max height of terrain
-	m_terrainGen->SetMaxHeight(100.0f);
+	m_terrainGen->SetMaxHeight(m_maxHeight);
 
 	SetupTerrainShader();
-	GenerateTerrain(m_dimension, 1);
+	GenerateTerrain(m_dimension, m_diamondSquareOn);
 
 	SetupSkyboxShader();
 	LoadSkybox();
@@ -376,7 +396,6 @@ void Assignment1::SetupRocks()
 
 void Assignment1::DrawRocks()
 {
-
 	for (auto i = m_rock1Locations.begin(); i != m_rock1Locations.end(); i++)
 	{
 		m_rock1->Render(m_camera, m_LightDir, (*i));
@@ -494,17 +513,17 @@ void Assignment1::LoadSkybox()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void Assignment1::GenerateTerrain(unsigned int dimensions, int method)
+void Assignment1::GenerateTerrain(unsigned int dimensions, bool method)
 {
 	if (method)
 	{
 		// ask for roughness and smoothing
-		m_terrainData = m_terrainGen->GenerateDiamondSquare(dimensions, 0.3f, true);
+		m_terrainData = m_terrainGen->GenerateDiamondSquare(dimensions, m_generatorRoughness, m_gaussianSmoothing);
 	}
 	else
 	{
 		// ask how many octaves
-		m_terrainData = m_terrainGen->GeneratePerlin(dimensions, 6);
+		m_terrainData = m_terrainGen->GeneratePerlin(dimensions, m_perlinOctaves);
 	}
 
 	glGenTextures(1, &m_terrainTextureMap);
@@ -608,7 +627,7 @@ void Assignment1::GenerateWaterVerts(unsigned int rows, unsigned int cols)
 	{
 		for (unsigned int c = 0; c < cols; ++c)
 		{
-			aoVertices[r * cols + c].position = vec4((float)c, 10, (float)r, 1);
+			aoVertices[r * cols + c].position = vec4((float)c, m_waterHeight, (float)r, 1);
 			aoVertices[r * cols + c].normal = vec4(0, 1, 0, 1);
 			aoVertices[r * cols + c].texIndex = vec2(((float)r / (rows - 1)), ((float)c / (cols - 1)));
 		}
@@ -699,6 +718,17 @@ void Assignment1::DrawWater()
 
 	texloc = glGetUniformLocation(m_waterShader, "periodScale");
 	glUniform1f(texloc, 0.6f);
+
+	mat4 camera_matrix = m_camera->getWorldTransform();
+	texloc = glGetUniformLocation(m_waterShader, "CameraPos");
+	glUniform3f(texloc, camera_matrix[3][0],
+		camera_matrix[3][1], camera_matrix[3][2]);
+
+	texloc = glGetUniformLocation(m_waterShader, "LightDir");
+	glUniform3f(texloc, m_LightDir.x, m_LightDir.y, m_LightDir.z);
+
+	texloc = glGetUniformLocation(m_waterShader, "SpecPow");
+	glUniform1f(texloc, 32.0f);
 
 	glBindVertexArray(m_water_VAO);
 

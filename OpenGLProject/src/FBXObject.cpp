@@ -149,7 +149,6 @@ void FBXObject::Render(FlyCamera* camera, vec3 LightDir, mat4 LocalMatrix)
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(LocalMatrix));
 
 	vec4 Light = vec4(LightDir, 1) * LocalMatrix;
-
 	vec3 Lightout = glm::normalize(vec3(Light.x, Light.y, Light.z));
 
 	loc = glGetUniformLocation(m_programID, "LightDir");
@@ -179,7 +178,7 @@ void FBXObject::Render(FlyCamera* camera, vec3 LightDir, mat4 LocalMatrix)
 	}
 
 	int roughness = glGetUniformLocation(m_programID, "roughness");
-	glUniform1f(roughness, 0.2f);
+	glUniform1f(roughness, 0.8f);
 
 	int fresnel = glGetUniformLocation(m_programID, "fresnel");
 	glUniform1f(fresnel, 1.0f);
