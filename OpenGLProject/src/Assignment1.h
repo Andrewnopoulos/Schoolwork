@@ -7,6 +7,7 @@
 #include "FBXObject.h"
 #include "SnowEmitter.h"
 #include <vector>
+#include <AntTweakBar.h>
 
 using glm::vec2;
 using glm::vec3;
@@ -33,6 +34,8 @@ private:
 	FlyCamera* m_camera;
 
 	TerrainGenerator* m_terrainGen;
+
+	TwBar* m_gui;
 	
 	float previousTime;
 	float deltaTime;
@@ -57,6 +60,10 @@ private:
 	unsigned int m_waterShader;
 
 	unsigned int m_waterTexture;
+
+	void LoadAssets();
+
+	void SetupAntTweakBar();
 
 	void GenerateWaterVerts(unsigned int rows, unsigned int cols);
 	void SetupWaterShader();

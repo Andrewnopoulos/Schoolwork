@@ -2,6 +2,8 @@
 #include <stb_image.h>
 #include <vector>
 
+#include <AntTweakBar.h>
+
 void Assignment1::Startup()
 {
 	m_terrainGen = new TerrainGenerator(5.0f);
@@ -14,13 +16,19 @@ void Assignment1::Startup()
 	m_camera->setLookAt(vec3(10, 30, 10), vec3(100, 0, 100), vec3(0, 1, 0));
 
 	m_camera->setSpeed(10);
-	m_camera->setRotationSpeed(10);
+	m_camera->setRotationSpeed(0.1f);
 
 	previousTime = (float)glfwGetTime();
 
-	LoadTextures();
+	LoadAssets();
+
+	m_dimension = 257;
+
+	m_LightDir = vec3(0, 1, 0);
 
 	SetupScene();
+
+	SetupAntTweakBar();
 }
 
 void Assignment1::Update()
@@ -52,6 +60,45 @@ void Assignment1::Draw()
 	m_snowEmitter->draw(previousTime,
 		m_camera->getWorldTransform(),
 		m_camera->getProjectionView());
+
+	TwDraw();
+}
+
+void OnMouseButton(GLFWwindow*, int b, int a, int m) {
+	TwEventMouseButtonGLFW(b, a);
+}
+void OnMousePosition(GLFWwindow*, double x, double y) {
+	TwEventMousePosGLFW((int)x, (int)y);
+}
+void OnMouseScroll(GLFWwindow*, double x, double y) {
+	TwEventMouseWheelGLFW((int)y);
+}
+void OnKey(GLFWwindow*, int k, int s, int a, int m) {
+	TwEventKeyGLFW(k, a);
+}
+void OnChar(GLFWwindow*, unsigned int c) {
+	TwEventCharGLFW(c, GLFW_PRESS);
+}
+void OnWindowResize(GLFWwindow*, int w, int h) {
+	TwWindowSize(w, h);
+	glViewport(0, 0, w, h);
+}
+
+void Assignment1::SetupAntTweakBar()
+{
+	TwInit(TW_OPENGL_CORE, nullptr);
+	TwWindowSize(1280, 720);
+
+	m_gui = TwNewBar("Interface");
+
+	TwAddVarRW(m_gui, "Light Direction", TW_TYPE_DIR3F, &m_LightDir, "group=light");
+
+	glfwSetMouseButtonCallback(window, OnMouseButton);
+	glfwSetCursorPosCallback(window, OnMousePosition);
+	glfwSetScrollCallback(window, OnMouseScroll);
+	glfwSetKeyCallback(window, OnKey);
+	glfwSetCharCallback(window, OnChar);
+	glfwSetWindowSizeCallback(window, OnWindowResize);
 }
 
 void Assignment1::DrawTerrain()
@@ -183,18 +230,43 @@ void Assignment1::LoadTextures()
 
 void Assignment1::Destroy()
 {
+	TwDeleteAllBars();
+	TwTerminate();
+}
+
+void Assignment1::LoadAssets()
+{
+	m_rock1 = new FBXObject("../data/trees/rock.fbx");
+	m_rock1->SetupShader(m_shaderManager,
+		"../data/shaders/tree.vert",
+		"../data/shaders/tree.frag");
+	m_rock1->LoadDiffuse("../data/trees/rockDiffuse.tga");
+	m_rock1->LoadNormals("../data/trees/rockNormal.tga");
+
+	m_rock2 = new FBXObject("../data/trees/Rock2.fbx");
+	m_rock2->SetupShader(m_shaderManager,
+		"../data/shaders/tree.vert",
+		"../data/shaders/tree.frag");
+	m_rock2->LoadDiffuse("../data/trees/Rock2.jpg");
+
+	m_spire = new FBXObject("../data/trees/stone.fbx");
+	m_spire->SetupShader(m_shaderManager,
+		"../data/shaders/tree.vert",
+		"../data/shaders/tree.frag");
+	m_spire->LoadDiffuse("../data/trees/stone.jpg");
+
+	LoadSkybox();
+
+	LoadTextures();
 
 }
 
 void Assignment1::SetupScene()
 {
 	// get number of dimensions from user
-	m_dimension = 257;
-
-	m_LightDir = vec3(0, 1, 0);
 
 	// get max height of terrain
-	m_terrainGen->SetMaxHeight(80.0f);
+	m_terrainGen->SetMaxHeight(100.0f);
 
 	SetupTerrainShader();
 	GenerateTerrain(m_dimension, 1);
@@ -253,25 +325,6 @@ void Assignment1::SetupTerrainShader()
 
 void Assignment1::SetupRocks()
 {
-	m_rock1 = new FBXObject("../data/trees/rock.fbx");
-	m_rock1->SetupShader(m_shaderManager,
-		"../data/shaders/tree.vert", 
-		"../data/shaders/tree.frag");
-	m_rock1->LoadDiffuse("../data/trees/rockDiffuse.tga");
-	m_rock1->LoadNormals("../data/trees/rockNormal.tga");
-
-	m_rock2 = new FBXObject("../data/trees/Rock2.fbx");
-	m_rock2->SetupShader(m_shaderManager,
-		"../data/shaders/tree.vert",
-		"../data/shaders/tree.frag");
-	m_rock2->LoadDiffuse("../data/trees/Rock2.jpg");
-
-	m_spire = new FBXObject("../data/trees/stone.fbx");
-	m_spire->SetupShader(m_shaderManager,
-		"../data/shaders/tree.vert",
-		"../data/shaders/tree.frag");
-	m_spire->LoadDiffuse("../data/trees/stone.jpg");
-
 	// set up matrices
 
 	m_rock1Locations.clear();

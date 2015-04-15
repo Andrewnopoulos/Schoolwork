@@ -49,7 +49,7 @@ void FlyCamera::HandleKeyboardInput(float deltaTime)
 
 void FlyCamera::HandleMouseInput(float deltaTime)
 {
-	if (glfwGetMouseButton(myWindow, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+	if (glfwGetMouseButton(myWindow, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
 	{
 		if (viewButtonClicked == false)
 		{

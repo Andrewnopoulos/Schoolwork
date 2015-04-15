@@ -102,13 +102,15 @@ void main() {
 	
 	const float cliffBound = 0.8;
 	
+	float dotNorm = dot(normalize(vNormal.xyz), vec3(0, 1, 0));
+	
 	vec4 outColour = black;
 	if (fscale >= 0.0 && fscale <= range0)
 	{
 		outColour = sand;
-		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < cliffBound)
+		if (dotNorm < cliffBound)
 		{
-			outColour = dirt;
+			outColour = mix(dirt, outColour, dotNorm);
 		}
 	} else if (fscale <= range1)
 	{
@@ -119,17 +121,17 @@ void main() {
 		
 		outColour += sand * fscale;
 		outColour += grass * fscale2;
-		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < cliffBound)
+		if (dotNorm < cliffBound)
 		{
-			outColour = dirt;
+			outColour = mix(dirt, outColour, dotNorm);
 		}
 	}
 	else if (fscale <= range2)
 	{
 		outColour = grass;
-		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < cliffBound)
+		if (dotNorm < cliffBound)
 		{
-			outColour = dirt;
+			outColour = mix(dirt, outColour, dotNorm);
 		}
 	}else if (fscale <= range3)
 	{
@@ -140,9 +142,9 @@ void main() {
 		
 		outColour += grass * fscale;
 		outColour += dirt * fscale2;
-		if (dot(normalize(vNormal.xyz), vec3(0, 1, 0)) < cliffBound)
+		if (dotNorm < cliffBound)
 		{
-			outColour = dirt;
+			outColour = mix(dirt, outColour, dotNorm);
 		}
 	}else if (fscale <= range4)
 	{

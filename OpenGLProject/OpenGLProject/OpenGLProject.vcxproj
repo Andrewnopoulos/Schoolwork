@@ -53,13 +53,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLM_SWIZZLE;GLM_FORCE_PURE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep\glm;$(SolutionDir)dep\aieutil;$(SolutionDir)dep\glfw-3.1.bin.WIN32\include;$(SolutionDir)dep\stb;$(SolutionDir)dep\FBXLoader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\AntTweakBar\include;$(SolutionDir)dep\glm;$(SolutionDir)dep\aieutil;$(SolutionDir)dep\glfw-3.1.bin.WIN32\include;$(SolutionDir)dep\stb;$(SolutionDir)dep\FBXLoader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)dep\FBXLoader;$(SolutionDir)dep\glfw-3.1.bin.WIN32\lib-vc2012;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;FBXLoader_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\andrew.giannopoulos\Desktop\schoolwork\OpenGLProject\dep\AntTweakBar\lib;$(SolutionDir)dep\FBXLoader;$(SolutionDir)dep\glfw-3.1.bin.WIN32\lib-vc2012;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;FBXLoader_d.lib;AntTweakBar.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
