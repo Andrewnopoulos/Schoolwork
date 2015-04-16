@@ -105,6 +105,9 @@
     <ClCompile Include="..\src\SnowEmitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Tutorial14.cpp">
+      <Filter>Source Files\Tutorials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\gl_core_4_4.h">
@@ -187,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="..\src\SnowEmitter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Tutorial14.h">
+      <Filter>Header Files\Tutorials</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

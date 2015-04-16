@@ -11,12 +11,13 @@
 #include "Tutorial11.h" // shadows (with animated model)
 #include "Tutorial12.h" // procedural terrain generation
 #include "Tutorial13.h" // realistic lighting
+#include "Tutorial14.h"
 
 #include "Assignment1.h"
 
 int main() {
 
-	auto tute = new Assignment1();
+	auto tute = new Tutorial14();
 
 	tute->Run();
 
