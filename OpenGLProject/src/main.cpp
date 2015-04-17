@@ -11,13 +11,14 @@
 #include "Tutorial11.h" // shadows (with animated model)
 #include "Tutorial12.h" // procedural terrain generation
 #include "Tutorial13.h" // realistic lighting
-#include "Tutorial14.h"
+#include "Tutorial14.h" // cache coherency
+#include "Tutorial15.h" // GPGPU
 
 #include "Assignment1.h"
 
 int main() {
 
-	auto tute = new Tutorial14();
+	auto tute = new Tutorial15();
 
 	tute->Run();
 
