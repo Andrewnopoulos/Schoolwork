@@ -18,7 +18,9 @@ public:
 	}
 	glm::vec4 centre;
 	float radius;
-};class Node {
+};
+
+class Node {
 public:
 	Node() : parent(nullptr), localTransform(1) {}
 	virtual ~Node() { for (auto child : children) delete child; }
@@ -61,7 +63,11 @@ void Tutorial14::addChildren(Node* root, int childrenPerNode, int depth) {
 			root->addChild(child);
 		}
 	}
-}void Tutorial14::Run(){	Node* root = new Node();
+}
+
+void Tutorial14::Run()
+{
+	Node* root = new Node();
 	addChildren(root, 5, 6);
 
 	// query the speed of the CPU clock cycles
@@ -80,4 +86,5 @@ void Tutorial14::addChildren(Node* root, int childrenPerNode, int depth) {
 
 	cout << duration << endl;
 
-	delete root;}
+	delete root;
+}

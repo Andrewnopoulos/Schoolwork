@@ -13,12 +13,13 @@
 #include "Tutorial13.h" // realistic lighting
 #include "Tutorial14.h" // cache coherency
 #include "Tutorial15.h" // GPGPU
+#include "Tutorial16.h" // Audio programming
 
 #include "Assignment1.h"
 
 int main() {
 
-	auto tute = new Tutorial15();
+	auto tute = new Tutorial16();
 
 	tute->Run();
 

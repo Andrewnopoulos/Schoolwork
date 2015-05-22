@@ -53,13 +53,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLM_SWIZZLE;GLM_FORCE_PURE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep\opencl\inc;$(SolutionDir)dep\AntTweakBar\include;$(SolutionDir)dep\glm;$(SolutionDir)dep\aieutil;$(SolutionDir)dep\glfw-3.1.bin.WIN32\include;$(SolutionDir)dep\stb;$(SolutionDir)dep\FBXLoader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\opencl\inc;$(SolutionDir)dep\AntTweakBar\include;$(SolutionDir)dep\glm;$(SolutionDir)dep\aieutil;$(SolutionDir)dep\glfw-3.1.bin.WIN32\include;$(SolutionDir)dep\stb;$(SolutionDir)dep\FBXLoader;$(SolutionDir)dep\lowlevel\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)dep\FBXLoader;$(SolutionDir)dep\glfw-3.1.bin.WIN32\lib-vc2012;$(SolutionDir)dep\AntTweakBar\lib;$(SolutionDir)dep\opencl\lib\Win32\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;FBXLoader_d.lib;AntTweakBar.lib;OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dep\FBXLoader;$(SolutionDir)dep\glfw-3.1.bin.WIN32\lib-vc2012;$(SolutionDir)dep\AntTweakBar\lib;$(SolutionDir)dep\opencl\lib\Win32\x86;$(SolutionDir)dep\lowlevel\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;FBXLoader_d.lib;AntTweakBar.lib;OpenCL.lib;fmod_vc.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,6 +106,7 @@
     <ClCompile Include="..\src\Tutorial13.cpp" />
     <ClCompile Include="..\src\Tutorial14.cpp" />
     <ClCompile Include="..\src\Tutorial15.cpp" />
+    <ClCompile Include="..\src\Tutorial16.cpp" />
     <ClCompile Include="..\src\Tutorial2.cpp" />
     <ClCompile Include="..\src\Tutorial3.cpp" />
     <ClCompile Include="..\src\Tutorial4.cpp" />
@@ -137,6 +138,7 @@
     <ClInclude Include="..\src\Tutorial13.h" />
     <ClInclude Include="..\src\Tutorial14.h" />
     <ClInclude Include="..\src\Tutorial15.h" />
+    <ClInclude Include="..\src\Tutorial16.h" />
     <ClInclude Include="..\src\Tutorial2.h" />
     <ClInclude Include="..\src\Tutorial3.h" />
     <ClInclude Include="..\src\Tutorial4.h" />

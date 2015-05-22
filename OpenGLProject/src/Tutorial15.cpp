@@ -17,11 +17,15 @@ void Tutorial15::Init()
 	// get the first platform
 	result = clGetPlatformIDs(1, &m_platform, nullptr);
 	if (result != CL_SUCCESS)
-		printf("clGetPlatformIDs failed: %i\n", result);	// get the first device on the platform (default is GPU)
+		printf("clGetPlatformIDs failed: %i\n", result);
+
+	// get the first device on the platform (default is GPU)
 	result = clGetDeviceIDs(m_platform, CL_DEVICE_TYPE_DEFAULT,
 		1, &m_device, nullptr);
 	if (result != CL_SUCCESS)
-		printf("clGetDeviceIDs failed: %i\n", result);	// create a context for a device on the specified platform
+		printf("clGetDeviceIDs failed: %i\n", result);
+
+	// create a context for a device on the specified platform
 	cl_context_properties contextProperties[] = {
 		CL_CONTEXT_PLATFORM, (cl_context_properties)m_platform,
 		0
@@ -29,23 +33,35 @@ void Tutorial15::Init()
 	m_context = clCreateContext(contextProperties, 1, &m_device,
 		nullptr, nullptr, &result);
 	if (result != CL_SUCCESS)
-		printf("clCreateContext failed: %i\n", result);	// create a command queue to process commands
+		printf("clCreateContext failed: %i\n", result);
+
+	// create a command queue to process commands
 	m_queue = clCreateCommandQueue(m_context, m_device,
 		CL_QUEUE_PROFILING_ENABLE, &result);
 	if (result != CL_SUCCESS)
-		printf("clCreateCommandQueue failed: %i\n", result);	LoadKernel("../data/kernels/tutorial15kernel.cl");	result = clBuildProgram(m_program, 1, &m_device,
+		printf("clCreateCommandQueue failed: %i\n", result);
+
+	LoadKernel("../data/kernels/tutorial15kernel.cl");
+
+	result = clBuildProgram(m_program, 1, &m_device,
 		nullptr, nullptr, nullptr);
 	if (result != CL_SUCCESS)
-		printf("clBuildProgram failed: %i\n", result);	// extract the kernel
+		printf("clBuildProgram failed: %i\n", result);
+
+	// extract the kernel
 	m_kernel = clCreateKernel(m_program, "normalize_vec4", &result);
 	if (result != CL_SUCCESS)
-		printf("clCreateKernel failed: %i\n", result);	// create cl buffer for our data and copy it off the host (CPU)
+		printf("clCreateKernel failed: %i\n", result);
+
+	// create cl buffer for our data and copy it off the host (CPU)
 	m_buffer = clCreateBuffer(m_context,
 		CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
 		sizeof(glm::vec4) * VECTOR_COUNT, m_vectors,
 		&result);
 	if (result != CL_SUCCESS)
-		printf("clCreateBuffer failed: %i\n", result);
+		printf("clCreateBuffer failed: %i\n", result);
+
+
 }
 
 void Tutorial15::LoadKernel(char* filename)
@@ -66,7 +82,8 @@ void Tutorial15::LoadKernel(char* filename)
 	m_program = clCreateProgramWithSource(m_context, 1,
 		(const char**)&kernelSource, &kernelSize, &result);
 	if (result != CL_SUCCESS)
-		printf("clCreateProgramWithSource failed: %i\n", result);
+		printf("clCreateProgramWithSource failed: %i\n", result);
+
 }
 
 void Tutorial15::Destroy()
@@ -115,7 +132,8 @@ void Tutorial15::RunGPU()
 		sizeof(glm::vec4) * VECTOR_COUNT, m_vectors,
 		1, &eventID, nullptr);
 	if (result != CL_SUCCESS)
-		printf("clEnqueueReadBuffer failed: %i\n", result);
+		printf("clEnqueueReadBuffer failed: %i\n", result);
+
 	// finish all opencl commands
 	clFlush(m_queue);
 	clFinish(m_queue);
